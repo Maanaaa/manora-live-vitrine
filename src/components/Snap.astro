@@ -1,0 +1,53 @@
+---
+/**
+ * Une « photo de soirée » illustrée : fond chaud, guirlande, silhouettes d'invités.
+ * Sert de photo factice dans les animations (pas de vraies photos d'invités).
+ */
+interface Props {
+  variant?: number;
+  people?: number;
+  class?: string;
+}
+const { variant = 0, people = 2, class: cls = '' } = Astro.props;
+
+const palettes = [
+  ['#f6c98b', '#ec5c46', '#132537', '#fffaf1'],
+  ['#a9ded2', '#136d66', '#fffaf1', '#132537'],
+  ['#fff3df', '#e8a838', '#b83a22', '#132537'],
+  ['#22384f', '#132537', '#ec5c46', '#a9ded2'],
+  ['#ead8bd', '#b87955', '#132537', '#fffaf1'],
+  ['#ff8d78', '#b83a22', '#fffaf1', '#e8a838'],
+];
+const [c1, c2, p1, p2] = palettes[variant % palettes.length];
+const id = `s${variant}-${Math.random().toString(36).slice(2, 7)}`;
+
+const layouts: Record<number, { x: number; s: number; c: string }[]> = {
+  1: [{ x: 50, s: 1.1, c: p1 }],
+  2: [{ x: 36, s: 1, c: p1 }, { x: 64, s: 1.08, c: p2 }],
+  3: [{ x: 24, s: .92, c: p2 }, { x: 50, s: 1.08, c: p1 }, { x: 76, s: .96, c: p2 }],
+};
+const figs = layouts[people] ?? layouts[2];
+---
+<svg class:list={['snap', cls]} viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <linearGradient id={id} x1="0" y1="0" x2="0.4" y2="1">
+      <stop offset="0" stop-color={c1} />
+      <stop offset="1" stop-color={c2} />
+    </linearGradient>
+  </defs>
+  <rect width="100" height="100" fill={`url(#${id})`} />
+  <path d="M-5 14 Q25 26 50 16 T105 14" fill="none" stroke="rgba(255,255,255,.35)" stroke-width=".6" />
+  {[6, 18, 30, 42, 54, 66, 78, 90].map((x, i) => (
+    <circle cx={x} cy={i % 2 ? 19 : 17} r="1.4" fill="#fff6d5" opacity=".9" />
+  ))}
+  {figs.map((f) => (
+    <g transform={`translate(${f.x} 100) scale(${f.s})`} fill={f.c}>
+      <circle cx="0" cy="-58" r="11" />
+      <path d="M-20 0 C-20 -26 -14 -42 0 -42 C14 -42 20 -26 20 0 Z" />
+    </g>
+  ))}
+</svg>
+
+<style>
+  .snap { width: 100%; height: 100%; display: block; }
+</style>

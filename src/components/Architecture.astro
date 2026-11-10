@@ -1,0 +1,345 @@
+---
+const devices = ['Présence', 'Température', 'Télécommande', 'Prise connectée', 'Tout autre capteur'];
+const terminal = [
+  { name: 'Zigbee2MQTT', hl: false },
+  { name: 'Mosquitto', hl: false },
+  { name: 'Passerelle', hl: true },
+  { name: 'File locale', hl: false },
+];
+const api = [
+  { name: 'API REST', hl: true },
+  { name: 'WebSocket', hl: true },
+  { name: 'Moteur de règles', hl: false },
+  { name: 'Notifications push', hl: false },
+  { name: 'Auth et rôles', hl: false },
+  { name: 'Base de données', hl: false },
+];
+const clients = [
+  { t: 'Tablette de la borne', d: 'Caméra, décompte, QR' },
+  { t: 'App mobile', d: 'Client et invités, en direct' },
+  { t: 'Back-office', d: 'Parc, règles, utilisateurs' },
+  { t: 'Site vitrine', d: 'Vous êtes ici' },
+];
+const json = [
+  ['p', '{'],
+  ['k', '  "terminal"', ': ', 'v', '"manora-01",'],
+  ['k', '  "device"', ': ', 'v', '"0x00158d0001a2b3c4",'],
+  ['k', '  "readings"', ': {'],
+  ['k', '    "temperature"', ': ', 'v', '41.2,'],
+  ['k', '    "humidity"', ': ', 'v', '38,'],
+  ['k', '    "battery"', ': ', 'v', '92'],
+  ['p', '  },'],
+  ['k', '  "ts"', ': ', 'v', '"2026-11-12T23:02:07Z"'],
+  ['p', '}'],
+];
+const esc = (t: string) => t.replace(/&/g, '&amp;').replace(/</g, '&lt;');
+const jsonHtml = json
+  .map((l, i) => {
+    const parts = l.length === 2
+      ? `<span class="${l[0]}">${esc(l[1])}</span>`
+      : `<span class="${l[0]}">${esc(l[1])}</span><span class="p">${esc(l[2])}</span>` +
+        (l[3] ? `<span class="${l[3]}">${esc(l[4])}</span>` : '');
+    return `<span class="ln" style="--k:${i}">${parts}</span>`;
+  })
+  .join('\n');
+---
+<section class="section arch" id="architecture">
+  <div class="wrap">
+    <p class="eyebrow" data-reveal>Sous le capot</p>
+    <h2 class="h2 split">Du capteur à la notification, <span class="serif">en temps réel.</span></h2>
+    <p class="lead" data-reveal style="--d:200">
+      Un Raspberry Pi caché dans la borne écoute les capteurs Zigbee et traduit chaque message dans un format commun.
+      Il l'envoie à l'API Manora, qui applique les règles, prévient le client et met à jour toutes les applis en direct.
+    </p>
+
+    <div class="diagram" data-inview>
+      <div class="col devices" data-reveal="left">
+        <p class="col-t">Appareils Zigbee</p>
+        <ul>
+          {devices.map((d, i) => <li style={`--k:${i}`}><span class="led"></span>{d}</li>)}
+        </ul>
+      </div>
+
+      <div class="link" aria-hidden="true"><span class="flow"></span><span class="pkt"></span><span class="lbl">Zigbee</span></div>
+
+      <div class="node dark" data-reveal="scale" style="--d:150">
+        <div class="node-head">
+          <span class="chip-ic" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+          <div>
+            <p class="node-t">Raspberry Pi</p>
+            <p class="node-s">Le terminal, dans la borne</p>
+          </div>
+        </div>
+        <ul class="svc">
+          {terminal.map((s) => <li class:list={{ hl: s.hl }}>{s.name}</li>)}
+        </ul>
+      </div>
+
+      <div class="link two-way" aria-hidden="true"><span class="flow"></span><span class="pkt"></span><span class="pkt back"></span><span class="lbl">HTTPS · WS</span></div>
+
+      <div class="node dark api" data-reveal="scale" style="--d:250">
+        <div class="node-head">
+          <span class="srv-ic" aria-hidden="true"><i></i><i></i><i></i></span>
+          <div>
+            <p class="node-t">API Manora</p>
+            <p class="node-s">Sur le serveur, en ligne</p>
+          </div>
+        </div>
+        <ul class="svc">
+          {api.map((s) => <li class:list={{ hl: s.hl }}>{s.name}</li>)}
+        </ul>
+      </div>
+
+      <div class="link" aria-hidden="true"><span class="flow"></span><span class="pkt"></span><span class="lbl">Temps réel</span></div>
+
+      <div class="col clients" data-reveal="right" style="--d:350">
+        <p class="col-t">Interfaces</p>
+        {clients.map((c) => (
+          <div class="cli"><b>{c.t}</b><span>{c.d}</span></div>
+        ))}
+      </div>
+    </div>
+
+    <div class="below">
+      <div class="code" data-inview>
+        <div class="code-bar"><i></i><i></i><i></i><span>Événement envoyé par la borne à l'API</span></div>
+        <pre><code set:html={jsonHtml} /></pre>
+      </div>
+
+      <ul class="whys">
+        <li data-reveal>
+          <b>Un format commun pour tous les capteurs</b>
+          <p>La passerelle lit ce que chaque appareil sait mesurer et produit toujours le même message. Un capteur inconnu apparaît dans l'app et le back-office, avec le bon affichage, sans toucher au code.</p>
+        </li>
+        <li data-reveal style="--d:100">
+          <b>Si la connexion coupe, rien n'est perdu</b>
+          <p>Les événements sont gardés dans une file sur le Pi et renvoyés dès que la connexion revient. L'API sait quand la borne ou un capteur est hors ligne.</p>
+        </li>
+        <li data-reveal style="--d:200">
+          <b>Les interfaces ne parlent qu'à l'API</b>
+          <p>Jamais directement à la borne. Chaque terminal s'authentifie avec sa propre clé, et le broker MQTT n'est jamais exposé sur Internet.</p>
+        </li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<style>
+  .arch { background: var(--paper); }
+  .h2 .serif { color: var(--coral); }
+  .lead { margin-top: 22px; }
+
+  .diagram {
+    display: grid;
+    grid-template-columns: minmax(150px, .8fr) minmax(36px, .3fr) minmax(190px, 1fr) minmax(56px, .4fr) minmax(210px, 1.1fr) minmax(36px, .3fr) minmax(180px, .9fr);
+    align-items: center;
+    margin-top: 70px;
+  }
+  .col-t {
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 12px;
+  }
+  .devices ul { list-style: none; display: grid; gap: 8px; }
+  .devices li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    background: var(--cream-2);
+    border: 1px solid var(--sand);
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 700;
+  }
+  .devices li:last-child { border-style: dashed; color: var(--muted); }
+  .led { width: 8px; height: 8px; border-radius: 50%; background: var(--mint); flex-shrink: 0; }
+  .is-in .led { animation: led 2.5s calc(var(--k) * .5s) infinite; }
+  @keyframes led { 0%, 70%, 100% { background: var(--mint); box-shadow: none; } 80% { background: var(--coral); box-shadow: 0 0 0 4px rgba(236, 92, 70, .2); } }
+
+  /* Liens animés */
+  .link { position: relative; height: 40px; }
+  .flow {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 50%;
+    height: 2px;
+    margin-top: -1px;
+    background: repeating-linear-gradient(90deg, var(--line-strong) 0 6px, transparent 6px 12px);
+    background-size: 12px 2px;
+  }
+  .is-in .flow { animation: flow .6s linear infinite; }
+  @keyframes flow { to { background-position: 12px 0; } }
+  .pkt {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    width: 10px;
+    height: 10px;
+    margin: -5px 0 0 -5px;
+    border-radius: 50%;
+    background: var(--coral);
+    box-shadow: 0 0 0 4px rgba(236, 92, 70, .2);
+    opacity: 0;
+  }
+  .is-in .pkt { animation: pkt 2s var(--ease-out) infinite; }
+  .pkt.back { background: var(--teal); box-shadow: 0 0 0 4px rgba(19, 109, 102, .2); }
+  .is-in .pkt.back { animation: pktBack 2s 1s var(--ease-out) infinite; }
+  @keyframes pkt { 0% { left: 0; opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { left: 100%; opacity: 0; } }
+  @keyframes pktBack { 0% { left: 100%; opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { left: 0; opacity: 0; } }
+  .lbl {
+    position: absolute;
+    left: 50%;
+    bottom: calc(50% + 10px);
+    transform: translateX(-50%);
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+
+  /* Nœuds : Pi et API */
+  .node {
+    border-radius: var(--radius);
+    padding: 20px;
+    position: relative;
+  }
+  .node.dark { background: var(--ink); color: var(--cream-2); box-shadow: var(--shadow); }
+  .node.api::before {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    border-radius: inherit;
+    padding: 1px;
+    background: conic-gradient(from var(--a, 0deg), transparent 0 70%, var(--coral) 85%, var(--mint) 95%, transparent);
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+  }
+  @property --a { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
+  .is-in .node.api::before { animation: border 4s linear infinite; }
+  @keyframes border { to { --a: 360deg; } }
+
+  .node-head { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+  .chip-ic, .srv-ic {
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+    border-radius: 10px;
+    background: var(--teal);
+    display: grid;
+    gap: 4px;
+    padding: 9px;
+  }
+  .chip-ic { grid-template-columns: 1fr 1fr; }
+  .srv-ic { background: var(--coral); grid-template-rows: repeat(3, 1fr); }
+  .chip-ic i { background: var(--mint); border-radius: 2px; }
+  .srv-ic i { background: rgba(255, 255, 255, .85); border-radius: 2px; }
+  .is-in .chip-ic i, .is-in .srv-ic i { animation: cpu 1.6s infinite; }
+  .chip-ic i:nth-child(2), .srv-ic i:nth-child(2) { animation-delay: .4s !important; }
+  .chip-ic i:nth-child(3), .srv-ic i:nth-child(3) { animation-delay: 1.2s !important; }
+  .chip-ic i:nth-child(4) { animation-delay: .8s !important; }
+  @keyframes cpu { 50% { opacity: .3; } }
+  .node-t { font-weight: 800; font-size: 17px; color: #fff; }
+  .node-s { font-size: 12px; color: var(--mint); font-weight: 600; }
+  .svc { list-style: none; display: flex; flex-wrap: wrap; gap: 6px; }
+  .svc li {
+    font-size: 12.5px;
+    padding: 5px 10px;
+    border-radius: 8px;
+    background: rgba(255, 250, 241, .08);
+    border: 1px solid rgba(255, 250, 241, .16);
+  }
+  .svc li.hl { background: var(--coral); border-color: var(--coral); color: #fff; font-weight: 700; }
+
+  .clients { display: grid; gap: 8px; }
+  .clients .col-t { margin-bottom: 4px; }
+  .cli {
+    padding: 11px 14px;
+    border-radius: 14px;
+    background: var(--mint-soft);
+    border: 1px solid var(--mint);
+    font-size: 12.5px;
+    line-height: 1.35;
+  }
+  .cli b { display: block; font-size: 14px; margin-bottom: 1px; }
+  .cli span { color: var(--ink-light); }
+
+  /* Code + arguments */
+  .below {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 50px;
+    margin-top: 90px;
+    align-items: start;
+  }
+  .code {
+    background: #1b2a39;
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+  }
+  .code-bar {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 14px 18px;
+    background: rgba(255, 255, 255, .04);
+    border-bottom: 1px solid rgba(255, 255, 255, .06);
+  }
+  .code-bar i { width: 11px; height: 11px; border-radius: 50%; background: #ec5c46; }
+  .code-bar i:nth-child(2) { background: var(--sun); }
+  .code-bar i:nth-child(3) { background: var(--mint); }
+  .code-bar span { margin-left: 10px; font-size: 12px; color: #8aa0b4; font-weight: 600; }
+  pre {
+    padding: 22px 24px 26px;
+    font-family: var(--mono);
+    font-size: 14px;
+    line-height: 1.7;
+    color: #e9eef3;
+    overflow-x: auto;
+  }
+  .code :global(.ln) {
+    display: inline;
+    opacity: 0;
+    transition: opacity .3s calc(var(--k) * 140ms + 200ms);
+  }
+  .code.is-in :global(.ln) { opacity: 1; }
+  :global(.no-js) .code :global(.ln) { opacity: 1; }
+  .code :global(.k) { color: var(--mint); }
+  .code :global(.v) { color: #f6ca55; }
+  .code :global(.p) { color: #e9eef3; }
+
+  .whys { list-style: none; display: grid; gap: 28px; }
+  .whys li { padding-left: 22px; border-left: 3px solid var(--coral); }
+  .whys b { font-size: 19px; letter-spacing: -.01em; }
+  .whys p { color: var(--ink-light); margin-top: 6px; }
+
+  @media (max-width: 1080px) {
+    .diagram { grid-template-columns: 1fr; max-width: 520px; margin-inline: auto; }
+    .link { height: 64px; }
+    .flow {
+      left: 50%;
+      right: auto;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      height: auto;
+      margin: 0 0 0 -1px;
+      background: repeating-linear-gradient(180deg, var(--line-strong) 0 6px, transparent 6px 12px);
+      background-size: 2px 12px;
+    }
+    @keyframes flow { to { background-position: 0 12px; } }
+    .pkt { left: 50%; top: 0; margin: -5px 0 0 -5px; }
+    @keyframes pkt { 0% { top: 0; opacity: 0; } 10%, 90% { opacity: 1; } 100% { top: 100%; opacity: 0; } }
+    @keyframes pktBack { 0% { top: 100%; opacity: 0; } 10%, 90% { opacity: 1; } 100% { top: 0; opacity: 0; } }
+    .lbl { left: calc(50% + 14px); bottom: auto; top: 50%; transform: translateY(-50%); }
+    .devices ul, .clients { grid-template-columns: 1fr 1fr; }
+    .clients .col-t { grid-column: 1 / -1; }
+    .below { grid-template-columns: 1fr; }
+  }
+</style>

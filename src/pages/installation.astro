@@ -1,0 +1,354 @@
+---
+import Base from '../layouts/Base.astro';
+import Mark from '../components/Mark.astro';
+
+const toc = [
+  { id: 'materiel', t: 'Le matériel' },
+  { id: 'pi', t: 'Préparer le Raspberry Pi' },
+  { id: 'services', t: 'Lancer les services' },
+  { id: 'serveur', t: 'Relier la borne au serveur' },
+  { id: 'capteurs', t: 'Appairer les capteurs' },
+  { id: 'tablette', t: 'Associer la tablette' },
+  { id: 'verifier', t: 'Vérifier avant la soirée' },
+  { id: 'depannage', t: 'Dépannage' },
+];
+---
+<Base
+  title="Installer la borne · Manora Live"
+  description="Documentation d'installation de la borne Manora Live : Raspberry Pi, services Docker, Wi-Fi local, capteurs Zigbee et tablette."
+>
+  <div class="progress" aria-hidden="true"><span></span></div>
+
+  <header class="doc-hero">
+    <div class="wrap">
+      <a href="/" class="back">← Retour à l'accueil</a>
+      <div class="title-row">
+        <Mark size={84} />
+        <div>
+          <p class="eyebrow">Documentation</p>
+          <h1 class="h2 split">Installer la borne <span class="serif">Manora Live</span></h1>
+        </div>
+      </div>
+      <p class="lead" data-reveal style="--d:300">
+        De la carte SD vierge à la borne prête pour la soirée. Le Raspberry Pi s'installe une seule fois ;
+        ensuite, une soirée se résume à brancher, allumer et vérifier que tout remonte.
+      </p>
+      <p class="note" data-reveal style="--d:400">Documentation en cours de rédaction : elle suit l'avancement du projet.</p>
+    </div>
+  </header>
+
+  <div class="wrap doc">
+    <nav class="toc" aria-label="Sommaire">
+      <p class="toc-t">Sommaire</p>
+      <ol>
+        {toc.map((s, i) => (
+          <li><a href={`#${s.id}`} data-toc={s.id}><span>{String(i + 1).padStart(2, '0')}</span>{s.t}</a></li>
+        ))}
+      </ol>
+    </nav>
+
+    <article class="content">
+      <section id="materiel" data-sec>
+        <h2><span>01</span>Le matériel</h2>
+        <div class="kit">
+          <div class="item"><b>Raspberry Pi</b><span>Avec son alimentation et une carte micro SD</span></div>
+          <div class="item"><b>Clé Zigbee</b><span>Le coordinateur, sur une rallonge USB</span></div>
+          <div class="item"><b>Tablette Android</b><span>L'écran et l'appareil photo de la borne</span></div>
+          <div class="item s"><b>Capteur de présence</b><span>Face à l'emplacement des invités</span></div>
+          <div class="item s"><b>Température et humidité</b><span>À l'intérieur de la structure</span></div>
+          <div class="item a"><b>Prise connectée</b><span>Avec la lampe de la borne branchée dessus</span></div>
+          <div class="item c"><b>Télécommande</b><span>Pour la veille et le réveil</span></div>
+          <div class="item"><b>Une connexion Internet</b><span>Wi-Fi de la salle ou partage de connexion</span></div>
+        </div>
+      </section>
+
+      <section id="pi" data-sec>
+        <h2><span>02</span>Préparer le Raspberry Pi</h2>
+        <ol class="steps">
+          <li>Installez <b>Raspberry Pi OS Lite (64 bits)</b> avec Raspberry Pi Imager, en réglant le nom d'hôte, l'utilisateur, le Wi-Fi et SSH dès l'écriture de la carte.</li>
+          <li>Branchez la clé Zigbee sur une rallonge USB, loin des ports USB 3, puis démarrez le Pi.</li>
+          <li>Installez Docker et repérez la clé Zigbee :</li>
+        </ol>
+        <pre><code><span class="c"># sur le Pi</span>
+curl -fsSL https://get.docker.com | sh
+sudo usermod -aG docker $USER
+ls -l /dev/serial/by-id/</code></pre>
+        <ol class="steps" start="4">
+          <li>Récupérez le projet et créez le fichier de configuration à partir de l'exemple :</li>
+        </ol>
+        <pre><code>git clone &lt;dépôt du terminal&gt; manora-terminal
+cd manora-terminal
+cp .env.example .env   <span class="c"># puis renseignez les secrets</span></code></pre>
+        <p class="tip"><b>Les secrets</b> restent dans <code>.env</code>, qui n'est jamais versionné.</p>
+      </section>
+
+      <section id="services" data-sec>
+        <h2><span>03</span>Lancer les services</h2>
+        <p>Sur le Pi, trois conteneurs Docker redémarrent seuls à chaque allumage :</p>
+        <pre><code>docker compose up -d</code></pre>
+        <div class="svc">
+          <div><code>zigbee2mqtt</code><span>Pilote les appareils Zigbee</span></div>
+          <div><code>mosquitto</code><span>Broker MQTT, protégé par identifiant, jamais exposé</span></div>
+          <div><code>passerelle</code><span>Format commun, file locale, envoi à l'API</span></div>
+        </div>
+      </section>
+
+      <section id="serveur" data-sec>
+        <h2><span>04</span>Relier la borne au serveur</h2>
+        <ol class="steps">
+          <li>Dans le back-office, ajoutez un terminal : une clé propre à cette borne est créée.</li>
+          <li>Renseignez l'adresse de l'API et cette clé dans le <code>.env</code> du Pi, puis relancez la passerelle.</li>
+          <li>La borne apparaît <b>en ligne</b> dans le back-office : elle envoie un signe de vie régulier.</li>
+        </ol>
+        <p class="tip"><b>Connexion coupée ?</b> La passerelle garde les événements dans une file locale et les renvoie dans l'ordre au retour du réseau.</p>
+      </section>
+
+      <section id="capteurs" data-sec>
+        <h2><span>05</span>Appairer les capteurs</h2>
+        <ol class="steps">
+          <li>Dans le back-office, lancez l'appairage sur la borne.</li>
+          <li>Mettez chaque appareil en mode appairage (souvent un appui long sur son bouton).</li>
+          <li>Il apparaît dans la liste avec ses mesures. Donnez-lui un nom parlant et un emplacement : <code>presence-borne</code>, <code>prise-lumiere</code>…</li>
+        </ol>
+        <p class="tip"><b>Un capteur que la borne ne connaît pas</b> fonctionne aussi : ses valeurs s'affichent automatiquement et peuvent servir dans une règle.</p>
+        <div class="place">
+          <div><b>Présence</b><span>À hauteur de taille, face aux invités</span></div>
+          <div><b>Température</b><span>Dans la structure, près de la tablette</span></div>
+          <div><b>Prise connectée</b><span>Entre la lampe de la borne et le secteur</span></div>
+        </div>
+      </section>
+
+      <section id="tablette" data-sec>
+        <h2><span>06</span>Associer la tablette</h2>
+        <ol class="steps">
+          <li>Installez l'application Manora sur la tablette et ouvrez-la en mode borne.</li>
+          <li>Connectez-vous avec le compte de l'événement : la tablette se rattache à la borne.</li>
+          <li>Faites une photo test : elle doit apparaître dans la galerie de l'app en quelques secondes.</li>
+        </ol>
+      </section>
+
+      <section id="verifier" data-sec>
+        <h2><span>07</span>Vérifier avant la soirée</h2>
+        <ul class="check">
+          <li>La borne et tous ses capteurs sont indiqués en ligne dans le back-office, batteries comprises.</li>
+          <li>Rester devant la borne lance le décompte et allume la lumière.</li>
+          <li>Souffler sur le capteur de température fait bouger la valeur dans l'app, sans rafraîchir.</li>
+          <li>Une règle de test envoie bien une notification au téléphone du client.</li>
+          <li>La télécommande met la borne en veille, puis la réveille.</li>
+        </ul>
+      </section>
+
+      <section id="depannage" data-sec>
+        <h2><span>08</span>Dépannage</h2>
+        <div class="faq">
+          <div><b>La borne apparaît hors ligne</b><p>Vérifiez la connexion Internet du Pi. Les événements de la soirée ne sont pas perdus : ils partiront dès que la connexion reviendra.</p></div>
+          <div><b>Le décompte se déclenche trop tôt ou trop tard</b><p>Ajustez le délai de la règle de présence dans l'app ou le back-office. Le décompte peut aussi être annulé.</p></div>
+          <div><b>Un capteur ne répond plus</b><p>Vérifiez sa pile dans l'app, puis rapprochez-le de la clé Zigbee. Les capteurs à pile « dorment » et peuvent mettre quelques secondes à répondre.</p></div>
+          <div><b>Les heures des événements sont fausses</b><p>L'horloge du Pi n'est pas synchronisée : vérifiez sa connexion, il se remet à l'heure tout seul une fois en ligne.</p></div>
+        </div>
+      </section>
+    </article>
+  </div>
+</Base>
+
+<script>
+  // Sommaire : section en cours + barre de progression de lecture
+  const links = document.querySelectorAll<HTMLAnchorElement>('[data-toc]');
+  const io = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((e) => {
+        if (!e.isIntersecting) return;
+        links.forEach((l) => l.classList.toggle('is-current', l.dataset.toc === e.target.id));
+      });
+    },
+    { rootMargin: '-30% 0px -60% 0px' },
+  );
+  document.querySelectorAll('[data-sec]').forEach((s) => io.observe(s));
+
+  const bar = document.querySelector<HTMLElement>('.progress span');
+  const onScroll = () => {
+    const h = document.documentElement.scrollHeight - window.innerHeight;
+    bar?.style.setProperty('transform', `scaleX(${h > 0 ? window.scrollY / h : 0})`);
+  };
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+</script>
+
+<style>
+  .progress { position: fixed; top: 0; left: 0; right: 0; height: 3px; z-index: 60; }
+  .progress span { display: block; height: 100%; background: var(--coral); transform-origin: left; transform: scaleX(0); }
+
+  .doc-hero { background: var(--cream-2); padding: 140px 0 70px; }
+  .back { font-size: 14px; font-weight: 700; text-decoration: none; color: var(--muted); }
+  .back:hover { color: var(--terracotta); }
+  .title-row { display: flex; align-items: center; gap: 24px; margin: 30px 0 20px; }
+  .title-row :global(svg) { flex-shrink: 0; }
+  .title-row .eyebrow { margin-bottom: 10px; }
+  .h2 .serif { color: var(--coral); }
+  .note {
+    display: inline-block;
+    margin-top: 20px;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 8px 14px;
+    border-radius: 99px;
+    background: var(--cream);
+    color: #85462f;
+  }
+
+  .doc {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    gap: 70px;
+    padding-block: 70px 120px;
+  }
+  .toc { position: sticky; top: 100px; align-self: start; }
+  .toc-t { font-size: 12px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin-bottom: 14px; }
+  .toc ol { list-style: none; border-left: 2px solid var(--line); }
+  .toc a {
+    display: flex;
+    gap: 10px;
+    padding: 8px 0 8px 16px;
+    margin-left: -2px;
+    border-left: 2px solid transparent;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--muted);
+    text-decoration: none;
+    transition: color .3s, border-color .3s, padding .4s var(--ease-out);
+  }
+  .toc a span { font-size: 12px; font-weight: 800; color: var(--muted); padding-top: 2px; transition: color .3s; }
+  .toc a:hover { color: var(--ink); }
+  .toc a:global(.is-current) { color: var(--ink); border-color: var(--coral); padding-left: 22px; }
+  .toc a:global(.is-current) span { color: var(--coral); }
+
+  .content { max-width: 760px; min-width: 0; }
+  section + section { margin-top: 80px; }
+  h2 {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    font-size: clamp(26px, 3vw, 34px);
+    font-weight: 800;
+    letter-spacing: -.03em;
+    margin-bottom: 22px;
+  }
+  h2 span { font-size: 15px; color: var(--terracotta); letter-spacing: .04em; }
+  p + p, p + pre, pre + p, ol + pre, pre + ol, p + ul, ul + p, p + .svc, pre + .svc, .svc + p, ol + p, p + .place, .tip + .place, p + .tip, ol + .tip, pre + .tip { margin-top: 18px; }
+  .content p, .content li { color: var(--ink-light); }
+  b { color: var(--ink); }
+
+  pre {
+    background: #1b2a39;
+    color: #e9eef3;
+    border-radius: var(--radius-sm);
+    padding: 18px 20px;
+    font-family: var(--mono);
+    font-size: 14px;
+    line-height: 1.7;
+    overflow-x: auto;
+  }
+  .c { color: #8aa0b4; }
+  :not(pre) > code {
+    background: var(--cream);
+    padding: 2px 7px;
+    border-radius: 6px;
+    color: var(--terracotta);
+    font-size: .86em;
+    overflow-wrap: anywhere;
+  }
+
+  .steps { counter-reset: s; list-style: none; display: grid; gap: 12px; }
+  .steps[start="4"] { counter-reset: s 3; }
+  .steps li { counter-increment: s; position: relative; padding-left: 44px; }
+  .steps li::before {
+    content: counter(s);
+    position: absolute;
+    left: 0;
+    top: -1px;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: var(--ink);
+    color: #fff;
+    font-size: 14px;
+    font-weight: 800;
+    display: grid;
+    place-items: center;
+  }
+
+  .kit { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .item {
+    padding: 16px;
+    border-radius: var(--radius-sm);
+    background: var(--cream-2);
+    border: 1px solid var(--sand);
+    font-size: 14px;
+    line-height: 1.4;
+  }
+  .item b { display: block; font-size: 15px; margin-bottom: 4px; }
+  .item span { color: var(--muted); }
+  .item.s { background: var(--mint-soft); border-color: var(--mint); }
+  .item.a { background: var(--terracotta-soft); border-color: #f2c6bb; }
+  .item.c { background: var(--cream); border-color: var(--sand); }
+
+  .svc { display: grid; gap: 8px; }
+  .svc div {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 12px 16px;
+    border-radius: 12px;
+    border: 1px solid var(--line-strong);
+    font-size: 15px;
+  }
+  .svc span { color: var(--muted); text-align: right; }
+
+  .facts, .check { list-style: none; display: grid; gap: 12px; margin-top: 18px; }
+  .facts li, .check li { position: relative; padding-left: 30px; }
+  .facts li::before { content: ""; position: absolute; left: 6px; top: 10px; width: 8px; height: 8px; border-radius: 50%; background: var(--coral); }
+  .check li::before {
+    content: "✓";
+    position: absolute;
+    left: 0;
+    top: 2px;
+    width: 20px;
+    height: 20px;
+    border-radius: 6px;
+    background: var(--mint);
+    color: var(--teal);
+    font-size: 12px;
+    font-weight: 800;
+    display: grid;
+    place-items: center;
+  }
+
+  .tip {
+    padding: 16px 18px;
+    border-left: 3px solid var(--coral);
+    background: var(--terracotta-soft);
+    border-radius: 0 12px 12px 0;
+  }
+
+  .place { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .place div { padding: 16px; border-radius: var(--radius-sm); background: var(--mint-soft); font-size: 14px; line-height: 1.4; }
+  .place b { display: block; margin-bottom: 4px; }
+  .place span { color: var(--ink-light); }
+
+  .faq { display: grid; gap: 14px; }
+  .faq div { padding: 18px 20px; border-radius: var(--radius-sm); border: 1px solid var(--line-strong); }
+  .faq p { margin-top: 6px; font-size: 16px; }
+
+  @media (max-width: 900px) {
+    .doc { grid-template-columns: 1fr; gap: 40px; padding-top: 40px; }
+    .toc { position: static; }
+    .kit { grid-template-columns: 1fr 1fr; }
+    .place { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 520px) {
+    .kit { grid-template-columns: 1fr; }
+    .title-row { flex-direction: column; align-items: flex-start; gap: 14px; }
+    .svc div { flex-direction: column; gap: 2px; }
+    .svc span { text-align: left; }
+  }
+</style>

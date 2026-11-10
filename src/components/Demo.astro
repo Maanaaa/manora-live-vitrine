@@ -1,0 +1,119 @@
+---
+import { Image } from 'astro:assets';
+import { site } from '../config';
+import poster from '../assets/photobooth-manora-mariage.jpg';
+---
+<section class="section demo on-dark" id="demo" data-progress>
+  <div class="wrap">
+    <div class="head">
+      <p class="eyebrow" data-reveal>Démonstration</p>
+      <h2 class="h2 split">La borne <span class="serif">en action.</span></h2>
+    </div>
+
+    <div class="screen">
+      {site.demoVideo ? (
+        <video controls preload="metadata" playsinline poster={poster.src}>
+          <source src={site.demoVideo} type="video/mp4" />
+        </video>
+      ) : (
+        <div class="placeholder">
+          <Image src={poster} alt="" widths={[800, 1400]} sizes="(max-width: 1200px) 95vw, 1180px" class="poster" />
+          <div class="overlay">
+            <span class="play" aria-hidden="true"><span></span></span>
+            <p class="soon">Vidéo de démonstration</p>
+            <p class="soon-s">Bientôt disponible : la borne filmée de la détection jusqu'à la photo sur le téléphone.</p>
+          </div>
+          <div class="rec" aria-hidden="true"><span></span>REC</div>
+          <div class="timecode" aria-hidden="true">00:00:12:08</div>
+        </div>
+      )}
+    </div>
+  </div>
+</section>
+
+<style>
+  .demo { background: var(--ink); color: var(--cream-2); --p: .5; }
+  .head { text-align: center; display: flex; flex-direction: column; align-items: center; margin-bottom: 50px; }
+  .h2 .serif { color: var(--coral); }
+
+  .screen {
+    border-radius: var(--radius);
+    overflow: hidden;
+    aspect-ratio: 16 / 9;
+    background: #000;
+    box-shadow: 0 40px 80px -30px rgba(0, 0, 0, .6);
+    /* zoom léger lié au scroll */
+    transform: scale(calc(.86 + min(var(--p) * 2, 1) * .14));
+    transition: transform .1s linear;
+  }
+  video { width: 100%; height: 100%; object-fit: cover; }
+
+  .placeholder { position: relative; width: 100%; height: 100%; }
+  .placeholder :global(.poster) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 50% 30%;
+    filter: brightness(.45) saturate(.9);
+    transform: scale(calc(1.15 - min(var(--p) * 2, 1) * .15));
+  }
+  .overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 20px;
+  }
+  .play {
+    position: relative;
+    width: clamp(70px, 9vw, 110px);
+    height: clamp(70px, 9vw, 110px);
+    border-radius: 50%;
+    background: var(--coral);
+    display: grid;
+    place-items: center;
+    margin-bottom: 24px;
+  }
+  .play::before, .play::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 2px solid var(--coral);
+    animation: halo 2.4s var(--ease-out) infinite;
+  }
+  .play::after { animation-delay: 1.2s; }
+  @keyframes halo { from { transform: scale(1); opacity: 1; } to { transform: scale(1.8); opacity: 0; } }
+  .play span {
+    margin-left: 6px;
+    border-left: 24px solid #fff;
+    border-top: 15px solid transparent;
+    border-bottom: 15px solid transparent;
+  }
+  .soon { font-size: clamp(20px, 2.4vw, 30px); font-weight: 800; letter-spacing: -.02em; color: #fff; }
+  .soon-s { color: rgba(255, 250, 241, .75); max-width: 44ch; margin-top: 6px; }
+
+  .rec {
+    position: absolute;
+    top: 20px;
+    left: 22px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 700;
+    color: #fff;
+  }
+  .rec span { width: 10px; height: 10px; border-radius: 50%; background: var(--coral); animation: recBlink 1s steps(1) infinite; }
+  @keyframes recBlink { 50% { opacity: 0; } }
+  .timecode { position: absolute; top: 20px; right: 22px; font-family: var(--mono); font-size: 13px; color: rgba(255, 255, 255, .8); }
+
+  @media (max-width: 600px) {
+    .screen { aspect-ratio: 4 / 5; }
+    .rec, .timecode { top: 14px; font-size: 11px; }
+  }
+</style>

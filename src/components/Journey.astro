@@ -1,0 +1,634 @@
+---
+import Mark from './Mark.astro';
+import Snap from './Snap.astro';
+
+const steps = [
+  {
+    n: '01',
+    title: 'Il se place',
+    text: "Le capteur de présence repère quelqu'un devant la borne depuis 5 secondes. Pas besoin de toucher l'écran : le décompte démarre tout seul.",
+    tag: 'Capteur de présence',
+  },
+  {
+    n: '02',
+    title: "La lumière s'allume",
+    text: "La prise connectée allume la lumière juste avant la photo, la tablette déclenche, puis tout s'éteint. Une lumière qui ne chauffe pas pour rien.",
+    tag: 'Prise connectée',
+  },
+  {
+    n: '03',
+    title: 'Il scanne le QR code',
+    text: "Le QR code affiché ouvre sa photo sur son téléphone, directement dans le navigateur. Aucune appli à chercher.",
+    tag: 'QR code',
+  },
+  {
+    n: '04',
+    title: 'Il la garde',
+    text: "Sa photo est sur son téléphone. Il suit la galerie de la soirée en direct, et peut même y ajouter les siennes.",
+    tag: 'Galerie en direct',
+  },
+];
+
+// QR code décoratif (21 × 21) : trois repères + motif pseudo-aléatoire stable
+const N = 21;
+let seed = 7;
+const rnd = () => ((seed = (seed * 9301 + 49297) % 233280) / 233280);
+const finder = (x: number, y: number) =>
+  [[0, 0], [N - 7, 0], [0, N - 7]].some(([fx, fy]) => x >= fx && x < fx + 7 && y >= fy && y < fy + 7);
+const cells: [number, number][] = [];
+for (let y = 0; y < N; y++)
+  for (let x = 0; x < N; x++) {
+    if (finder(x, y)) continue;
+    if (rnd() > 0.52) cells.push([x, y]);
+  }
+const finders = [[0, 0], [N - 7, 0], [0, N - 7]];
+---
+<section class="journey" id="parcours">
+  <div class="wrap head">
+    <p class="eyebrow" data-reveal>Le parcours d'un invité</p>
+    <h2 class="h2 split">De la borne <span class="serif">au téléphone,</span> en quatre temps.</h2>
+  </div>
+
+  <div class="wrap layout">
+    <div class="stage" data-stage data-step="1" aria-hidden="true">
+      <div class="rig">
+        <span class="halo"></span>
+
+        <!-- La borne -->
+        <div class="borne">
+          <span class="cam"></span>
+          <span class="lamp"></span>
+          <span class="pir"><i></i><i></i><i></i></span>
+
+          <div class="screen">
+            <!-- 1 · accueil -->
+            <div class="scr scr-1">
+              <Mark size={30} animated={false} />
+              <p class="welcome">Bienvenue à notre soirée</p>
+              <span class="pill">Approchez-vous</span>
+              <div class="presence"><span>Présence détectée</span><b></b></div>
+            </div>
+            <!-- 2 · aperçu caméra + décompte -->
+            <div class="scr scr-2">
+              <Snap variant={0} people={2} />
+              <div class="count"><span>3</span><span>2</span><span>1</span></div>
+              <span class="shutter"></span>
+            </div>
+            <!-- 3 · photo + QR -->
+            <div class="scr scr-3">
+              <div class="polaroid"><Snap variant={0} people={2} /></div>
+              <div class="qr">
+                <svg viewBox={`-1 -1 ${N + 2} ${N + 2}`}>
+                  <rect x="-1" y="-1" width={N + 2} height={N + 2} fill="#fff" />
+                  {finders.map(([x, y]) => (
+                    <g>
+                      <rect x={x + .5} y={y + .5} width="6" height="6" fill="none" stroke="#132537" stroke-width="1" rx="1" />
+                      <rect x={x + 2} y={y + 2} width="3" height="3" fill="#132537" rx=".5" />
+                    </g>
+                  ))}
+                  {cells.map(([x, y]) => <rect x={x} y={y} width="1" height="1" fill="#132537" />)}
+                </svg>
+                <small>Scannez-moi</small>
+              </div>
+            </div>
+            <!-- 4 · prête pour la suivante -->
+            <div class="scr scr-4">
+              <p class="welcome">Prête pour la suivante !</p>
+              <p class="stat"><b>48</b> photos partagées ce soir</p>
+              <div class="thumbs">
+                {[1, 2, 3, 4].map((v) => <span><Snap variant={v} people={(v % 3) + 1} /></span>)}
+              </div>
+            </div>
+            <span class="flashfx"></span>
+          </div>
+        </div>
+        <span class="pole"></span>
+        <span class="tripod"></span>
+
+        <!-- Le téléphone de l'invité -->
+        <div class="phone">
+          <span class="notch"></span>
+          <div class="ph ph-3">
+            <div class="toast"><span class="ok">✓</span> Photo trouvée</div>
+            <div class="viewfinder">
+              <span class="corner tl"></span><span class="corner tr"></span>
+              <span class="corner bl"></span><span class="corner br"></span>
+              <span class="scanline"></span>
+            </div>
+            <p class="hint">Visez le QR code de la borne</p>
+          </div>
+          <div class="ph ph-4">
+            <p class="app-title">Galerie en direct <span class="live-dot"></span></p>
+            <div class="mine">
+              <Snap variant={0} people={2} />
+              <span class="badge">Votre photo</span>
+            </div>
+            <div class="grid">
+              {[5, 1, 2, 3, 4, 2].map((v, i) => (
+                <span style={`--k:${i}`}><Snap variant={v} people={(i % 3) + 1} /></span>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <ol class="dots">
+        {steps.map((_, i) => <li data-dot={i + 1}></li>)}
+      </ol>
+    </div>
+
+    <ol class="steps">
+      {steps.map((s, i) => (
+        <li class="step" data-step-trigger={i + 1}>
+          <span class="n">Étape {s.n}</span>
+          <h3>{s.title}</h3>
+          <p>{s.text}</p>
+          <span class="tag">{s.tag}</span>
+        </li>
+      ))}
+    </ol>
+  </div>
+</section>
+
+<script>
+  const stage = document.querySelector<HTMLElement>('[data-stage]');
+  const triggers = document.querySelectorAll<HTMLElement>('[data-step-trigger]');
+  if (stage && triggers.length) {
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          if (!e.isIntersecting) return;
+          const step = (e.target as HTMLElement).dataset.stepTrigger!;
+          stage.dataset.step = step;
+          triggers.forEach((t) => t.classList.toggle('is-active', t === e.target));
+        });
+      },
+      {
+        rootMargin: window.matchMedia('(max-width: 900px)').matches
+          ? '-62% 0px -30% 0px'
+          : '-45% 0px -45% 0px',
+      },
+    );
+    triggers.forEach((t) => io.observe(t));
+  }
+</script>
+
+<style>
+  .journey {
+    background: var(--cream-2);
+    padding-block: clamp(80px, 12vw, 150px) 60px;
+    position: relative;
+  }
+  .head { margin-bottom: 40px; }
+  .h2 .serif { color: var(--coral); }
+
+  .layout {
+    display: grid;
+    grid-template-columns: 1.1fr 1fr;
+    gap: clamp(30px, 5vw, 80px);
+    align-items: start;
+  }
+
+  /* ── Étapes (colonne de droite) ── */
+  .steps { list-style: none; order: 2; padding-block: 18vh 30vh; }
+  .step {
+    min-height: 62vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    opacity: .25;
+    transition: opacity .6s var(--ease-out), transform .6s var(--ease-out);
+    transform: translateX(10px);
+  }
+  .step.is-active { opacity: 1; transform: none; }
+  .n {
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--terracotta);
+  }
+  .step h3 {
+    font-size: clamp(30px, 3.4vw, 44px);
+    font-weight: 800;
+    letter-spacing: -.035em;
+    line-height: 1.1;
+    margin: 10px 0 14px;
+  }
+  .step p { font-size: 18px; color: var(--ink-light); max-width: 42ch; }
+  .tag {
+    align-self: flex-start;
+    margin-top: 20px;
+    padding: 6px 14px;
+    border-radius: 99px;
+    background: var(--mint-soft);
+    color: var(--teal);
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  /* ── Scène sticky ── */
+  .stage {
+    order: 1;
+    position: sticky;
+    top: 12vh;
+    height: 76vh;
+    container-type: size;
+  }
+  .rig {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 34em;
+    height: 38em;
+    margin: -19em 0 0 -17em;
+    font-size: min(2.6cqi, 2.4cqb);
+  }
+  .halo {
+    position: absolute;
+    left: 2em;
+    top: 3em;
+    width: 30em;
+    height: 30em;
+    border-radius: 50%;
+    background: radial-gradient(circle, var(--cream) 0%, rgba(255, 243, 223, 0) 70%);
+    transition: background .8s;
+  }
+  [data-step="2"] .halo { background: radial-gradient(circle, rgba(255, 246, 213, 1) 0%, rgba(232, 168, 56, .18) 45%, rgba(255, 243, 223, 0) 70%); }
+  [data-step="3"] .halo, [data-step="4"] .halo { background: radial-gradient(circle, var(--mint-soft) 0%, rgba(169, 222, 210, 0) 70%); }
+
+  .borne {
+    position: absolute;
+    left: 1em;
+    top: 4em;
+    width: 21em;
+    height: 19em;
+    background: linear-gradient(160deg, #1d2a36, #0d151d);
+    border-radius: 1em;
+    box-shadow: 0 2em 3em -1.4em rgba(19, 37, 55, .5), inset 0 1px 0 rgba(255, 255, 255, .08);
+    z-index: 1;
+  }
+  .cam {
+    position: absolute;
+    top: 2em;
+    left: 50%;
+    width: 1.8em;
+    height: 1.8em;
+    margin-left: -.9em;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #4a6178, #05090d 60%);
+    box-shadow: 0 0 0 .25em #222c36;
+  }
+  .lamp {
+    position: absolute;
+    top: 1.2em;
+    right: 2em;
+    width: 3.6em;
+    height: 3.2em;
+    border-radius: .5em;
+    background: #3a434c;
+    transition: background .3s, box-shadow .5s;
+  }
+  [data-step="2"] .lamp {
+    background: #fffdf5;
+    box-shadow: 0 0 2em .6em rgba(255, 246, 213, .8), 0 0 6em 2em rgba(232, 168, 56, .35);
+  }
+
+  .pir {
+    position: absolute;
+    bottom: .9em;
+    left: 50%;
+    width: .7em;
+    height: .7em;
+    margin-left: -.35em;
+    border-radius: 50%;
+    background: var(--coral);
+  }
+  .pir i {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 8em;
+    height: 8em;
+    margin: -4em 0 0 -4em;
+    border-radius: 50%;
+    border: .15em solid var(--coral);
+    opacity: 0;
+  }
+  [data-step="1"] .pir i { animation: pir 2.4s var(--ease-out) infinite; }
+  [data-step="1"] .pir i:nth-child(2) { animation-delay: .8s; }
+  [data-step="1"] .pir i:nth-child(3) { animation-delay: 1.6s; }
+  @keyframes pir {
+    from { transform: scale(.05); opacity: .9; }
+    to { transform: scale(1.6); opacity: 0; }
+  }
+
+  .screen {
+    position: absolute;
+    left: 2.6em;
+    right: 2.6em;
+    top: 6em;
+    height: 10.4em;
+    background: #f5f8fb;
+    border-radius: .4em;
+    overflow: hidden;
+    box-shadow: 0 0 0 .5em #05090d;
+  }
+  .scr {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transform: scale(1.04);
+    transition: opacity .5s var(--ease-out), transform .7s var(--ease-out);
+  }
+  [data-step="1"] .scr-1, [data-step="2"] .scr-2, [data-step="3"] .scr-3, [data-step="4"] .scr-4 {
+    opacity: 1;
+    transform: none;
+  }
+
+  .scr-1, .scr-4 {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: .5em;
+    text-align: center;
+    background: linear-gradient(180deg, #fff 0%, var(--cream-2) 100%);
+  }
+  .scr-1 :global(svg) { width: 1.9em; height: 1.9em; }
+  .welcome { font-size: 1.15em; font-weight: 800; letter-spacing: -.02em; color: var(--ink); line-height: 1.1; }
+  .pill {
+    font-size: .7em;
+    font-weight: 800;
+    color: var(--ink);
+    padding: .45em 1.3em;
+    border-radius: 99px;
+    background: var(--sun);
+    animation: pillPulse 1.6s ease-in-out infinite;
+  }
+  @keyframes pillPulse { 50% { transform: scale(1.07); } }
+  .presence {
+    position: absolute;
+    left: .8em;
+    right: .8em;
+    bottom: .7em;
+    font-size: .55em;
+    font-weight: 700;
+    color: var(--muted);
+    text-align: left;
+  }
+  .presence b {
+    display: block;
+    height: .45em;
+    margin-top: .3em;
+    border-radius: 99px;
+    background: var(--sand);
+    position: relative;
+    overflow: hidden;
+  }
+  .presence b::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: var(--coral);
+    transform-origin: left;
+    transform: scaleX(0);
+  }
+  [data-step="1"] .presence b::after { animation: fill 5s linear infinite; }
+  @keyframes fill { to { transform: scaleX(1); } }
+
+  /* Décompte 3, 2, 1, flash */
+  .scr-2 :global(.snap) { position: absolute; inset: 0; filter: saturate(.9); }
+  .count { position: absolute; inset: 0; display: grid; place-items: center; }
+  .count span {
+    grid-area: 1 / 1;
+    font-size: 5.5em;
+    font-weight: 800;
+    color: #fff;
+    text-shadow: 0 .05em .3em rgba(0, 0, 0, .3);
+    opacity: 0;
+  }
+  [data-step="2"] .count span { animation: tick 4s infinite; }
+  [data-step="2"] .count span:nth-child(2) { animation-delay: 1s; }
+  [data-step="2"] .count span:nth-child(3) { animation-delay: 2s; }
+  @keyframes tick {
+    0% { opacity: 0; transform: scale(1.8); }
+    6% { opacity: 1; transform: scale(1); }
+    20% { opacity: 1; transform: scale(.9); }
+    25%, 100% { opacity: 0; transform: scale(.6); }
+  }
+  .shutter {
+    position: absolute;
+    inset: 0;
+    border: .3em solid rgba(255, 255, 255, .7);
+    border-radius: .4em;
+  }
+  .flashfx {
+    position: absolute;
+    inset: 0;
+    background: #fff;
+    opacity: 0;
+    pointer-events: none;
+  }
+  [data-step="2"] .flashfx { animation: flashfx 4s infinite; }
+  @keyframes flashfx {
+    0%, 74% { opacity: 0; }
+    76% { opacity: 1; }
+    90%, 100% { opacity: 0; }
+  }
+
+  /* Photo + QR */
+  .scr-3 {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.4em;
+    background: linear-gradient(180deg, #fff, var(--mint-soft));
+  }
+  .polaroid {
+    width: 6.6em;
+    height: 7.4em;
+    padding: .35em .35em 1.2em;
+    background: #fff;
+    border-radius: .2em;
+    box-shadow: 0 .4em 1em rgba(19, 37, 55, .2);
+    transform: rotate(-4deg);
+  }
+  [data-step="3"] .polaroid { animation: drop .8s var(--ease-spring) both; }
+  @keyframes drop { from { transform: translateY(-1.5em) rotate(6deg); opacity: 0; } }
+  .qr { display: flex; flex-direction: column; align-items: center; gap: .3em; }
+  .qr svg { width: 6.2em; height: 6.2em; border-radius: .3em; box-shadow: 0 0 0 .25em #fff, 0 .3em .8em rgba(19, 37, 55, .15); }
+  [data-step="3"] .qr svg { animation: qrIn .7s .2s var(--ease-spring) both; }
+  @keyframes qrIn { from { transform: scale(.4); opacity: 0; } }
+  .qr small { font-size: .6em; font-weight: 800; color: var(--teal); letter-spacing: .04em; }
+
+  /* Prête */
+  .stat { font-size: .7em; color: var(--muted); }
+  .stat b { color: var(--coral); font-size: 1.3em; }
+  .thumbs { display: flex; gap: .3em; margin-top: .2em; }
+  .thumbs span { width: 2.4em; height: 2.4em; border-radius: .3em; overflow: hidden; }
+  [data-step="4"] .thumbs span { animation: qrIn .5s var(--ease-spring) both; }
+  .thumbs span:nth-child(2) { animation-delay: .08s !important; }
+  .thumbs span:nth-child(3) { animation-delay: .16s !important; }
+  .thumbs span:nth-child(4) { animation-delay: .24s !important; }
+
+  .pole {
+    position: absolute;
+    left: 10.8em;
+    top: 23em;
+    width: 1.4em;
+    height: 12em;
+    background: linear-gradient(90deg, #0d151d, #2a3743, #0d151d);
+  }
+  .tripod {
+    position: absolute;
+    left: 6em;
+    top: 34.6em;
+    width: 11em;
+    height: .9em;
+    border-radius: .5em;
+    background: #0d151d;
+  }
+
+  /* Téléphone */
+  .phone {
+    position: absolute;
+    right: 0;
+    top: 9em;
+    width: 12.5em;
+    height: 25em;
+    border-radius: 2em;
+    background: var(--ink);
+    padding: .6em;
+    box-shadow: var(--shadow);
+    z-index: 2;
+    transform: translateY(6em) rotate(8deg);
+    opacity: 0;
+    transition: transform 1s var(--ease-spring), opacity .5s;
+  }
+  [data-step="3"] .phone, [data-step="4"] .phone { opacity: 1; transform: rotate(4deg); }
+  .notch {
+    position: absolute;
+    top: 1em;
+    left: 50%;
+    width: 3.2em;
+    height: .9em;
+    margin-left: -1.6em;
+    border-radius: 99px;
+    background: #000;
+    z-index: 3;
+  }
+  .ph {
+    position: absolute;
+    inset: .6em;
+    border-radius: 1.5em;
+    overflow: hidden;
+    opacity: 0;
+    transition: opacity .5s;
+  }
+  [data-step="3"] .ph-3, [data-step="4"] .ph-4 { opacity: 1; }
+
+  .ph-3 { background: #0b1118; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .viewfinder { position: relative; width: 7em; height: 7em; }
+  .corner { position: absolute; width: 1.6em; height: 1.6em; border: .25em solid var(--mint); }
+  .tl { top: 0; left: 0; border-right: 0; border-bottom: 0; border-radius: .5em 0 0 0; }
+  .tr { top: 0; right: 0; border-left: 0; border-bottom: 0; border-radius: 0 .5em 0 0; }
+  .bl { bottom: 0; left: 0; border-right: 0; border-top: 0; border-radius: 0 0 0 .5em; }
+  .br { bottom: 0; right: 0; border-left: 0; border-top: 0; border-radius: 0 0 .5em 0; }
+  .scanline {
+    position: absolute;
+    left: .6em;
+    right: .6em;
+    height: .2em;
+    background: var(--coral);
+    box-shadow: 0 0 1em var(--coral);
+    border-radius: 99px;
+  }
+  [data-step="3"] .scanline { animation: scan 1.6s ease-in-out infinite alternate; }
+  @keyframes scan { from { top: .6em; } to { top: 6.2em; } }
+  .hint { color: rgba(255, 255, 255, .6); font-size: .65em; margin-top: 1.4em; }
+  .toast {
+    position: absolute;
+    top: 2.2em;
+    left: .7em;
+    right: .7em;
+    display: flex;
+    align-items: center;
+    gap: .5em;
+    padding: .6em .8em;
+    background: #fff;
+    border-radius: .9em;
+    font-size: .62em;
+    font-weight: 700;
+    color: var(--ink);
+    opacity: 0;
+    transform: translateY(-1em);
+  }
+  [data-step="3"] .toast { animation: toast .6s 1.4s var(--ease-spring) both; }
+  @keyframes toast { to { opacity: 1; transform: none; } }
+  .ok { width: 1.5em; height: 1.5em; border-radius: 50%; background: var(--teal); color: #fff; display: grid; place-items: center; font-size: .9em; }
+
+  .ph-4 { background: var(--cream-2); padding: 2.4em .7em .7em; }
+  .app-title { font-size: .78em; font-weight: 800; display: flex; align-items: center; gap: .4em; margin-bottom: .6em; }
+  .live-dot { width: .5em; height: .5em; border-radius: 50%; background: var(--coral); animation: blinkDot 1.2s infinite; }
+  @keyframes blinkDot { 50% { opacity: .2; } }
+  .mine {
+    position: relative;
+    height: 8em;
+    border-radius: .8em;
+    overflow: hidden;
+    box-shadow: 0 .3em .8em rgba(19, 37, 55, .2);
+  }
+  [data-step="4"] .mine { animation: mineIn .9s var(--ease-spring) both; }
+  @keyframes mineIn { from { transform: translateY(-2em) scale(.6); opacity: 0; } }
+  .badge {
+    position: absolute;
+    left: .5em;
+    bottom: .5em;
+    font-size: .55em;
+    font-weight: 800;
+    background: var(--coral);
+    color: #fff;
+    padding: .3em .7em;
+    border-radius: 99px;
+  }
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: .35em; margin-top: .4em; }
+  .grid span { aspect-ratio: 1; border-radius: .4em; overflow: hidden; }
+  [data-step="4"] .grid span { animation: qrIn .5s calc(.4s + var(--k) * 70ms) var(--ease-spring) both; }
+
+  .dots {
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 8px;
+    list-style: none;
+  }
+  .dots li {
+    width: 8px;
+    height: 8px;
+    border-radius: 99px;
+    background: var(--sand);
+    transition: width .5s var(--ease-out), background .3s;
+  }
+  [data-step="1"] [data-dot="1"], [data-step="2"] [data-dot="2"], [data-step="3"] [data-dot="3"], [data-step="4"] [data-dot="4"] {
+    width: 28px;
+    background: var(--coral);
+  }
+
+  @media (max-width: 900px) {
+    .layout { display: block; }
+    .stage {
+      top: 60px;
+      height: 46vh;
+      z-index: 3;
+      background: linear-gradient(var(--cream-2) 85%, rgba(255, 250, 241, 0));
+      margin-inline: calc(var(--gutter) * -1);
+    }
+    .steps { padding-block: 2vh 30vh; }
+    .step { min-height: 46vh; justify-content: flex-start; padding-top: 4vh; transform: none; }
+    .step h3 { margin-top: 6px; }
+    .step p { font-size: 16px; }
+  }
+</style>

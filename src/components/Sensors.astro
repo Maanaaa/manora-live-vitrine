@@ -1,0 +1,404 @@
+---
+---
+<section class="section sensors on-dark" id="capteurs">
+  <div class="wrap">
+    <div class="intro">
+      <div>
+        <p class="eyebrow" data-reveal>Capteurs, actionneur et règles</p>
+        <h2 class="h2 split">Une borne qui <span class="serif">veille</span> toute seule.</h2>
+      </div>
+      <p class="lead" data-reveal style="--d:200">
+        Des appareils Zigbee discrets sont posés sur la borne. Chacun déclenche une règle simple,
+        « si… alors… », et le client est prévenu sur son téléphone quand il le faut.
+      </p>
+    </div>
+
+    <div class="bento">
+      <article class="tile t-pir" data-reveal data-inview data-repeat>
+        <div class="viz" aria-hidden="true">
+          <div class="radar">
+            <span class="ring r1"></span><span class="ring r2"></span><span class="ring r3"></span>
+            <span class="sweep"></span>
+            <span class="core"></span>
+            <span class="guest"></span>
+          </div>
+        </div>
+        <div class="meta"><span class="kind">Capteur</span><h3>Présence</h3></div>
+        <ul class="rules">
+          <li><span>Présence depuis 5 s</span><b>décompte et photo</b></li>
+          <li><span>Personne depuis 10 min</span><b>mode veille</b></li>
+        </ul>
+      </article>
+
+      <article class="tile t-plug" data-reveal data-inview data-repeat style="--d:100">
+        <div class="viz" aria-hidden="true">
+          <svg class="bulb" viewBox="0 0 48 64" width="48" height="64">
+            <path class="glass" d="M24 4a18 18 0 0 0-10 33c2 1.6 3 3.6 3 6v3h14v-3c0-2.4 1-4.4 3-6A18 18 0 0 0 24 4Z" />
+            <rect x="17" y="49" width="14" height="4" rx="2" fill="#475569" />
+            <rect x="19" y="55" width="10" height="4" rx="2" fill="#475569" />
+          </svg>
+          <span class="glow"></span>
+        </div>
+        <div class="meta"><span class="kind kind--a">Actionneur</span><h3>Prise connectée</h3></div>
+        <ul class="rules"><li><span>Juste avant la photo</span><b>lumière allumée</b></li></ul>
+      </article>
+
+      <article class="tile t-remote" data-reveal data-inview data-repeat style="--d:200">
+        <div class="viz" aria-hidden="true">
+          <div class="remote"><span class="btn-r"></span><span class="btn-r small"></span></div>
+          <div class="mode"><span class="moon">☾</span><span class="sun">☀</span></div>
+        </div>
+        <div class="meta"><span class="kind kind--c">Commande</span><h3>Télécommande</h3></div>
+        <ul class="rules"><li><span>Un appui</span><b>veille ou réveil</b></li></ul>
+      </article>
+
+      <article class="tile t-temp" data-reveal data-inview data-repeat style="--d:100">
+        <div class="viz" aria-hidden="true">
+          <div class="tube"><span></span></div>
+          <p class="deg"><span class="num"></span> °C</p>
+        </div>
+        <div class="meta"><span class="kind">Capteur</span><h3>Température et humidité</h3></div>
+        <ul class="rules"><li><span>Plus de 40 °C dans la structure</span><b>alerte au client</b></li></ul>
+      </article>
+
+      <article class="tile t-new" data-reveal data-inview data-repeat style="--d:200">
+        <div class="viz" aria-hidden="true">
+          <div class="pair">
+            <span class="dev"><i></i></span>
+            <span class="arrow"></span>
+            <div class="found">
+              <b>Nouvel appareil</b>
+              <span class="cap">humidité · 54 %</span>
+              <span class="cap">batterie · 92 %</span>
+            </div>
+          </div>
+        </div>
+        <div class="meta"><span class="kind">N'importe quel capteur</span><h3>Un appareil inconnu s'affiche tout seul</h3></div>
+        <p class="new-p">Appairé en direct, il apparaît avec ses valeurs dans l'app et le back-office, et devient utilisable dans une règle, sans toucher au code.</p>
+      </article>
+    </div>
+
+    <div class="notifs" data-reveal>
+      <div class="notifs-copy">
+        <h3 class="h3">Les règles se changent depuis l'app, <span class="serif">sans toucher au code.</span></h3>
+        <p class="muted-d">Elles sont enregistrées sur le serveur et s'appliquent aussitôt, sans redéployer quoi que ce soit.</p>
+      </div>
+      <div class="feed" aria-hidden="true">
+        <div class="n n1"><span class="ic">☾</span><div><b>La borne est en veille</b><small>Personne depuis 10 min</small></div></div>
+        <div class="n n2"><span class="ic sun">!</span><div><b>Température élevée</b><small>41 °C dans la structure</small></div></div>
+        <div class="n n3"><span class="ic coral">+</span><div><b>Nouvel appareil détecté</b><small>Disponible dans vos règles</small></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .sensors { background: var(--ink); color: var(--cream-2); overflow: hidden; }
+  .intro {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    align-items: end;
+    margin-bottom: 60px;
+  }
+  .h2 .serif { color: var(--mint); }
+  .lead { color: rgba(255, 250, 241, .72); }
+
+  .bento {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr 1fr;
+    gap: 18px;
+  }
+  .tile {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    padding: 24px;
+    border-radius: var(--radius);
+    background: var(--ink-light);
+    border: 1px solid rgba(255, 250, 241, .08);
+    transition: border-color .4s;
+  }
+  .tile:hover { border-color: rgba(169, 222, 210, .4); }
+  .t-pir { grid-row: span 2; }
+
+
+  .viz {
+    position: relative;
+    height: 150px;
+    border-radius: var(--radius-sm);
+    background: rgba(0, 0, 0, .2);
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+  }
+  .t-pir .viz { height: auto; flex: 1; min-height: 240px; }
+
+  .meta h3 { font-size: 21px; font-weight: 800; letter-spacing: -.02em; margin-top: 6px; line-height: 1.25; }
+  .kind {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--mint);
+  }
+  .kind--a { color: var(--coral-light); }
+  .kind--c { color: var(--sun); }
+  .new-p { font-size: 15px; color: rgba(255, 250, 241, .7); }
+
+  .rules { list-style: none; display: grid; gap: 8px; }
+  .rules li {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 10px;
+    font-size: 14px;
+    color: rgba(255, 250, 241, .7);
+  }
+  .rules li::before {
+    content: "SI";
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: .1em;
+    color: var(--mint);
+  }
+  .rules b {
+    color: #fff;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 99px;
+    background: rgba(236, 92, 70, .22);
+  }
+  .rules b::before { content: "→ "; color: var(--coral-light); }
+
+  /* Présence : radar */
+  .radar { position: relative; width: 220px; height: 220px; }
+  .ring { position: absolute; inset: 0; border-radius: 50%; border: 1px solid rgba(169, 222, 210, .25); }
+  .r2 { inset: 22%; }
+  .r3 { inset: 44%; }
+  .sweep {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: conic-gradient(from 0deg, rgba(169, 222, 210, .45), rgba(169, 222, 210, 0) 25%);
+  }
+  .is-in .sweep { animation: sweep 3s linear infinite; }
+  @keyframes sweep { to { transform: rotate(360deg); } }
+  .core { position: absolute; left: 50%; top: 50%; width: 14px; height: 14px; margin: -7px; border-radius: 50%; background: var(--mint); }
+  .guest {
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    margin: -8px;
+    border-radius: 50%;
+    background: var(--coral);
+    box-shadow: 0 0 0 6px rgba(236, 92, 70, .25);
+    left: 92%;
+    top: 20%;
+    opacity: 0;
+  }
+  .is-in .guest { animation: guest 6s var(--ease-out) infinite; }
+  @keyframes guest {
+    0% { left: 92%; top: 20%; opacity: 0; }
+    10% { opacity: 1; }
+    40%, 70% { left: 68%; top: 38%; opacity: 1; }
+    90%, 100% { left: 10%; top: 80%; opacity: 0; }
+  }
+
+  /* Prise + ampoule */
+  .bulb { position: relative; z-index: 1; }
+  .glass { fill: #2a3743; stroke: rgba(255, 255, 255, .25); stroke-width: 2; }
+  .t-plug.is-in .glass { animation: bulb 3s infinite; }
+  @keyframes bulb { 0%, 30%, 80%, 100% { fill: #2a3743; } 38%, 72% { fill: #fff6d5; } }
+  .glow {
+    position: absolute;
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(232, 168, 56, .6), rgba(232, 168, 56, 0) 65%);
+    opacity: 0;
+  }
+  .t-plug.is-in .glow { animation: glow 3s infinite; }
+  @keyframes glow { 0%, 30%, 80%, 100% { opacity: 0; transform: scale(.6); } 38%, 72% { opacity: 1; transform: scale(1); } }
+
+  /* Télécommande */
+  .t-remote .viz { display: flex; gap: 28px; justify-content: center; align-items: center; }
+  .remote {
+    width: 44px;
+    height: 92px;
+    border-radius: 22px;
+    background: #f2f2f2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding-top: 14px;
+  }
+  .btn-r { width: 24px; height: 24px; border-radius: 50%; background: #d4d4d4; box-shadow: inset 0 -2px 0 rgba(0, 0, 0, .15); }
+  .btn-r.small { width: 14px; height: 14px; }
+  .t-remote.is-in .btn-r:not(.small) { animation: press 4s infinite; }
+  @keyframes press {
+    0%, 20%, 30%, 70%, 80%, 100% { transform: scale(1); background: #d4d4d4; }
+    24%, 74% { transform: scale(.82); background: var(--coral); }
+  }
+  .mode { position: relative; width: 56px; height: 56px; font-size: 40px; line-height: 56px; text-align: center; }
+  .mode span { position: absolute; inset: 0; }
+  .moon { color: var(--mint); }
+  .sun { color: var(--sun); opacity: 0; }
+  .t-remote.is-in .moon { animation: moon 4s infinite; }
+  .t-remote.is-in .sun { animation: sunA 4s infinite; }
+  @keyframes moon { 0%, 24% { opacity: 0; transform: rotate(-90deg) scale(.5); } 30%, 72% { opacity: 1; transform: none; } 76%, 100% { opacity: 0; transform: rotate(90deg) scale(.5); } }
+  @keyframes sunA { 0%, 24% { opacity: 1; transform: none; } 30%, 72% { opacity: 0; transform: rotate(90deg) scale(.5); } 78%, 100% { opacity: 1; transform: none; } }
+
+  /* Température : compteur CSS */
+  @property --t {
+    syntax: '<integer>';
+    inherits: true;
+    initial-value: 24;
+  }
+  .t-temp .viz { display: flex; gap: 22px; justify-content: center; align-items: center; --t: 24; }
+  .t-temp.is-in .viz { animation: temp 6s ease-in-out infinite; }
+  @keyframes temp {
+    0%, 10% { --t: 24; }
+    55%, 75% { --t: 41; }
+    100% { --t: 24; }
+  }
+  .tube { width: 16px; height: 100px; border-radius: 99px; background: rgba(255, 255, 255, .1); position: relative; overflow: hidden; }
+  .tube span {
+    position: absolute;
+    inset: auto 0 0;
+    height: calc((var(--t) - 15) * 3%);
+    background: linear-gradient(to top, var(--sun), var(--coral));
+    border-radius: inherit;
+  }
+  .deg { font-size: 44px; font-weight: 800; letter-spacing: -.04em; color: #fff; }
+  .num { counter-reset: t var(--t); }
+  .num::after { content: counter(t); }
+  .t-temp.is-in .deg { animation: hot 6s ease-in-out infinite; }
+  @keyframes hot { 0%, 45% { color: #fff; } 55%, 75% { color: var(--coral-light); } 85%, 100% { color: #fff; } }
+
+  /* Capteur inconnu : appairage */
+  .pair { display: flex; align-items: center; gap: 18px; }
+  .dev {
+    position: relative;
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: #f2f2f2;
+    flex-shrink: 0;
+  }
+  .dev i {
+    position: absolute;
+    right: 7px;
+    top: 7px;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--teal);
+  }
+  .t-new.is-in .dev i { animation: pairBlink .5s steps(1) 6 both; }
+  @keyframes pairBlink { 50% { background: var(--coral); } }
+  .arrow {
+    width: 44px;
+    height: 2px;
+    background: repeating-linear-gradient(90deg, var(--mint) 0 5px, transparent 5px 10px);
+    background-size: 10px 2px;
+  }
+  .t-new.is-in .arrow { animation: pairFlow .5s linear infinite; }
+  @keyframes pairFlow { to { background-position: 10px 0; } }
+  .found {
+    display: grid;
+    gap: 6px;
+    padding: 12px 14px;
+    border-radius: 14px;
+    background: var(--cream-2);
+    color: var(--ink);
+    font-size: 13px;
+    opacity: 0;
+    transform: translateX(-10px) scale(.95);
+  }
+  .t-new.is-in .found { animation: pairFound .7s 3s var(--ease-spring) both; }
+  @keyframes pairFound { to { opacity: 1; transform: none; } }
+  .cap {
+    font-size: 12px;
+    font-weight: 700;
+    padding: 3px 9px;
+    border-radius: 99px;
+    background: var(--mint-soft);
+    color: var(--teal);
+  }
+
+  /* Flux de notifications */
+  .notifs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    align-items: center;
+    margin-top: 18px;
+    padding: 32px;
+    border-radius: var(--radius);
+    background: linear-gradient(120deg, rgba(169, 222, 210, .12), rgba(169, 222, 210, .02));
+    border: 1px solid rgba(169, 222, 210, .2);
+  }
+  .notifs .serif { color: var(--mint); }
+  .muted-d { color: rgba(255, 250, 241, .65); margin-top: 10px; font-size: 16px; }
+  .feed { position: relative; height: 200px; }
+  .n {
+    position: absolute;
+    left: 0;
+    right: 0;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    padding: 12px 14px;
+    border-radius: 16px;
+    background: var(--cream-2);
+    color: var(--ink);
+    font-size: 14px;
+    line-height: 1.3;
+    box-shadow: var(--shadow-sm);
+    animation: feed 9s var(--ease-out) infinite;
+    opacity: 0;
+  }
+  .n b { display: block; }
+  .n small { color: var(--muted); }
+  .n2 { animation-delay: 3s; }
+  .n3 { animation-delay: 6s; }
+  @keyframes feed {
+    0% { opacity: 0; transform: translateY(-30px) scale(.9); top: 0; }
+    6% { opacity: 1; transform: none; top: 0; }
+    33% { top: 0; opacity: 1; transform: none; }
+    39% { top: 68px; transform: scale(.96); opacity: .8; }
+    66% { top: 68px; transform: scale(.96); opacity: .8; }
+    72% { top: 136px; transform: scale(.92); opacity: .5; }
+    94% { top: 136px; opacity: .5; transform: scale(.92); }
+    100% { top: 150px; opacity: 0; transform: scale(.9); }
+  }
+  .ic {
+    width: 36px;
+    height: 36px;
+    flex-shrink: 0;
+    border-radius: 10px;
+    display: grid;
+    place-items: center;
+    background: var(--mint-soft);
+    color: var(--teal);
+    font-weight: 800;
+    font-size: 18px;
+  }
+  .ic.coral { background: var(--terracotta-soft); color: var(--terracotta); }
+  .ic.sun { background: var(--cream); color: var(--wood); }
+
+  @media (max-width: 960px) {
+    .intro { grid-template-columns: 1fr; gap: 20px; }
+    .bento { grid-template-columns: 1fr 1fr; }
+    .t-pir { grid-row: auto; grid-column: span 2; }
+    .notifs { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 600px) {
+    .bento { grid-template-columns: 1fr; }
+    .t-pir { grid-column: auto; }
+    .notifs { padding: 24px; }
+  }
+</style>

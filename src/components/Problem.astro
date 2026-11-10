@@ -1,0 +1,237 @@
+---
+const answer =
+  "Un Raspberry Pi caché dans la borne écoute ses capteurs et envoie tout en temps réel. Les invités récupèrent leurs photos d'un simple scan, et la borne réagit seule à ce qui se passe autour d'elle.";
+const words = answer.split(' ');
+---
+<section class="section problem" id="probleme">
+  <div class="wrap">
+    <p class="eyebrow" data-reveal>Le constat</p>
+    <h2 class="h2 split">Une belle soirée, <span class="serif">deux soucis</span> qui reviennent.</h2>
+
+    <div class="cards">
+      <article class="card" data-reveal data-inview>
+        <div class="viz viz-signal" aria-hidden="true">
+          <div class="stack"><i></i><i></i><i></i><span class="lock"></span></div>
+          <div class="upload">
+            <span class="spinner"></span>
+            <span>Envoi prévu demain…</span>
+          </div>
+        </div>
+        <span class="num">01</span>
+        <h3 class="h3">Les photos restent coincées dans la borne.</h3>
+        <p>Aujourd'hui, les photos sont envoyées après l'événement. Pendant la soirée, les invités ne peuvent ni les garder ni les partager, et repartent les mains vides.</p>
+      </article>
+
+      <article class="card card--mint" data-reveal data-inview style="--d:150">
+        <div class="viz viz-alert" aria-hidden="true">
+          <div class="box">
+            <span class="eye"></span>
+          </div>
+          <div class="pings">
+            <span>Allumée depuis 3 h</span>
+            <span>43 °C</span>
+            <span>Lumière restée allumée</span>
+          </div>
+        </div>
+        <span class="num">02</span>
+        <h3 class="h3">Pendant la soirée, personne ne la surveille.</h3>
+        <p>La borne reste allumée pour rien ou chauffe dans sa structure, sans que le client qui l'a louée ne le sache.</p>
+      </article>
+    </div>
+
+    <div class="answer" data-scrub>
+      <p class="eyebrow">La réponse</p>
+      <p class="sr-only">{answer}</p>
+      <p class="scrub" aria-hidden="true">
+        {words.map((w, i) => <span style={`--i:${i}`}>{w} </span>)}
+      </p>
+    </div>
+  </div>
+</section>
+
+<script>
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  document.querySelectorAll<HTMLElement>('[data-scrub]').forEach((block) => {
+    const words = block.querySelectorAll<HTMLElement>('.scrub span');
+    if (reduced) {
+      words.forEach((w) => w.classList.add('on'));
+      return;
+    }
+    const update = () => {
+      const r = block.getBoundingClientRect();
+      const vh = window.innerHeight;
+      const p = Math.min(Math.max((vh * 0.85 - r.top) / (vh * 0.55), 0), 1);
+      const lit = Math.round(p * words.length);
+      words.forEach((w, i) => w.classList.toggle('on', i < lit));
+    };
+    window.addEventListener('scroll', update, { passive: true });
+    update();
+  });
+</script>
+
+<style>
+  .problem { background: var(--paper); }
+  .h2 { max-width: 16ch; }
+  .h2 .serif { color: var(--coral); }
+
+  .cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-top: 60px;
+  }
+  .card {
+    position: relative;
+    background: var(--cream-2);
+    border: 1px solid var(--sand);
+    border-radius: var(--radius);
+    padding: 32px;
+    overflow: hidden;
+  }
+  .card--mint { background: var(--mint-soft); border-color: var(--mint); }
+  .card p { color: var(--ink-light); margin-top: 10px; }
+  .num {
+    display: block;
+    font-weight: 800;
+    font-size: 26px;
+    letter-spacing: -.03em;
+    color: var(--terracotta);
+    margin-bottom: 8px;
+  }
+  .card--mint .num { color: var(--teal); }
+
+  .viz {
+    height: 180px;
+    border-radius: var(--radius-sm);
+    background: #fff;
+    margin-bottom: 26px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 30px;
+    overflow: hidden;
+  }
+
+  /* Pile de photos verrouillée */
+  .stack { position: relative; width: 84px; height: 84px; }
+  .stack i {
+    position: absolute;
+    inset: 0;
+    border-radius: 8px;
+    background: #fff;
+    border: 5px solid #fff;
+    box-shadow: 0 6px 16px rgba(19, 37, 55, .16);
+    background-image: linear-gradient(160deg, #f6c98b, var(--coral));
+    background-clip: content-box;
+  }
+  .stack i:nth-child(1) { transform: rotate(-12deg); }
+  .stack i:nth-child(2) { transform: rotate(6deg); background-image: linear-gradient(160deg, var(--mint), var(--teal)); }
+  .stack i:nth-child(3) { transform: rotate(-2deg); background-image: linear-gradient(160deg, var(--cream), var(--sun)); }
+  .is-in .stack i:nth-child(1) { animation: fanL 4s var(--ease-out) infinite; }
+  .is-in .stack i:nth-child(2) { animation: fanR 4s var(--ease-out) infinite; }
+  @keyframes fanL { 0%, 20%, 80%, 100% { transform: rotate(-12deg); } 40%, 60% { transform: rotate(-20deg) translateX(-8px); } }
+  @keyframes fanR { 0%, 20%, 80%, 100% { transform: rotate(6deg); } 40%, 60% { transform: rotate(14deg) translateX(8px); } }
+  .lock {
+    position: absolute;
+    right: -12px;
+    bottom: -10px;
+    width: 30px;
+    height: 24px;
+    border-radius: 6px;
+    background: var(--ink);
+    z-index: 2;
+  }
+  .lock::before {
+    content: "";
+    position: absolute;
+    left: 7px;
+    top: -11px;
+    width: 12px;
+    height: 14px;
+    border: 3px solid var(--ink);
+    border-bottom: 0;
+    border-radius: 8px 8px 0 0;
+  }
+  .is-in .lock { animation: lockShake 4s infinite; }
+  @keyframes lockShake { 0%, 40%, 60%, 100% { transform: none; } 45% { transform: rotate(-12deg); } 50% { transform: rotate(10deg); } 55% { transform: rotate(-6deg); } }
+  .upload {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 16px;
+    background: var(--cream);
+    border-radius: 99px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--muted);
+  }
+  .spinner {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    border: 2.5px solid var(--sand);
+    border-top-color: var(--coral);
+    animation: spin 1s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Borne laissée sans surveillance */
+  .box {
+    width: 92px;
+    height: 104px;
+    background: var(--ink);
+    border-radius: 12px;
+    position: relative;
+    perspective: 300px;
+  }
+  .eye {
+    position: absolute;
+    top: 18px;
+    left: 50%;
+    width: 16px;
+    height: 16px;
+    margin-left: -8px;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: inset 0 0 0 5px #3a5068;
+  }
+  .pings { display: grid; gap: 8px; }
+  .pings span {
+    font-size: 13px;
+    font-weight: 700;
+    padding: 6px 12px;
+    border-radius: 99px;
+    background: var(--terracotta-soft);
+    color: var(--terracotta);
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  .is-in .pings span { animation: ping 4s var(--ease-out) infinite; }
+  .is-in .pings span:nth-child(2) { animation-delay: .25s; }
+  .is-in .pings span:nth-child(3) { animation-delay: .5s; }
+  @keyframes ping {
+    0%, 25% { opacity: 0; transform: translateX(-10px); }
+    35%, 80% { opacity: 1; transform: none; }
+    90%, 100% { opacity: 0; transform: none; }
+  }
+  .pings span::after { content: " · personne ne voit"; font-weight: 500; opacity: .7; }
+
+  /* Paragraphe qui s'allume au scroll */
+  .answer { margin-top: clamp(80px, 12vw, 140px); max-width: 1000px; }
+  .scrub {
+    font-size: clamp(26px, 3.6vw, 46px);
+    font-weight: 700;
+    letter-spacing: -.03em;
+    line-height: 1.22;
+  }
+  .scrub span { color: rgba(19, 37, 55, .14); transition: color .35s; }
+  .scrub span:global(.on) { color: var(--ink); }
+  .no-js .scrub span { color: var(--ink); }
+
+  @media (max-width: 820px) {
+    .cards { grid-template-columns: 1fr; }
+    .card { padding: 24px; }
+    .pings span::after { content: ""; }
+  }
+</style>

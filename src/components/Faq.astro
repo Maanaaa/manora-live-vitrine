@@ -1,0 +1,107 @@
+---
+const faq = [
+  {
+    q: 'Comment les invités récupèrent-ils leurs photos ?',
+    a: "En scannant le QR code affiché après chaque photo. Elle s'ouvre directement dans le navigateur du téléphone, et la galerie de la soirée se met à jour en direct.",
+  },
+  {
+    q: 'Les invités doivent-ils installer une application ?',
+    a: "Pour voir et télécharger leurs photos, non : le QR code suffit. L'application Manora apporte en plus l'envoi de ses propres photos et, pour le client, le suivi de la borne.",
+  },
+  {
+    q: 'Et si la connexion coupe pendant la soirée ?',
+    a: "La borne garde les événements et les photos dans une file d'attente, puis les envoie dès que la connexion revient. Rien n'est perdu.",
+  },
+  {
+    q: 'Que deviennent les photos des invités ?',
+    a: "Elles sont conservées pendant une durée limitée, puis supprimées. Chaque invité peut supprimer les photos qu'il a envoyées, et le client peut modérer la galerie.",
+  },
+  {
+    q: 'Comment suis-je prévenu si la borne a un souci ?',
+    a: "Par une notification sur votre téléphone : température trop élevée dans la structure, borne mise en veille faute d'invités, appareil hors ligne.",
+  },
+  {
+    q: 'La borne imprime-t-elle les photos ?',
+    a: "Pas avec Manora Live : le projet se concentre sur le partage des photos en direct et sur l'autonomie de la borne.",
+  },
+];
+---
+<section class="section faq">
+  <div class="wrap grid">
+    <div>
+      <p class="eyebrow" data-reveal>Questions fréquentes</p>
+      <h2 class="h2 split">Bon à <span class="serif">savoir.</span></h2>
+    </div>
+    <div class="list">
+      {faq.map((f, i) => (
+        <details data-reveal style={`--d:${i * 60}`}>
+          <summary>{f.q}<span class="plus" aria-hidden="true"></span></summary>
+          <div class="a"><p>{f.a}</p></div>
+        </details>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .faq { background: var(--cream-2); }
+  .grid { display: grid; grid-template-columns: .8fr 1.2fr; gap: 60px; align-items: start; }
+  .h2 .serif { color: var(--coral); }
+  .list { border-top: 1px solid var(--line-strong); }
+  details { border-bottom: 1px solid var(--line-strong); }
+  summary {
+    list-style: none;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    padding: 24px 0;
+    font-size: 19px;
+    font-weight: 700;
+    letter-spacing: -.01em;
+    transition: color .3s;
+  }
+  summary::-webkit-details-marker { display: none; }
+  summary:hover { color: var(--terracotta); }
+  .plus {
+    position: relative;
+    flex-shrink: 0;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--cream);
+    transition: background .3s, transform .5s var(--ease-spring);
+  }
+  .plus::before, .plus::after {
+    content: "";
+    position: absolute;
+    left: 11px;
+    right: 11px;
+    top: 50%;
+    height: 2px;
+    margin-top: -1px;
+    background: var(--ink);
+    border-radius: 2px;
+    transition: transform .4s var(--ease-out), background .3s;
+  }
+  .plus::after { transform: rotate(90deg); }
+  details[open] .plus { background: var(--coral); transform: rotate(180deg); }
+  details[open] .plus::before, details[open] .plus::after { background: #fff; }
+  details[open] .plus::after { transform: rotate(0); }
+
+  /* Ouverture animée (navigateurs récents) */
+  details::details-content {
+    block-size: 0;
+    overflow: hidden;
+    transition: block-size .5s var(--ease-out), content-visibility .5s allow-discrete;
+  }
+  details[open]::details-content { block-size: auto; }
+  :global(html) { interpolate-size: allow-keywords; }
+  .a p { padding-bottom: 24px; color: var(--ink-light); max-width: 60ch; }
+
+  @media (max-width: 860px) {
+    .grid { grid-template-columns: 1fr; gap: 30px; }
+    summary { font-size: 17px; }
+  }
+</style>
