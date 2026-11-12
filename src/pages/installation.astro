@@ -33,7 +33,7 @@ const toc = [
         De la carte SD vierge à la borne prête pour la soirée. Le Raspberry Pi s'installe une seule fois ;
         ensuite, une soirée se résume à brancher, allumer et vérifier que tout remonte.
       </p>
-      <p class="note" data-reveal style="--d:400">Documentation qui suit l'avancement du projet : le capteur de présence, la sonde de température et la télécommande sont prévus, la prise connectée est déjà appairée.</p>
+      <p class="note" data-reveal style="--d:400">Documentation qui suit l'avancement du projet : le capteur de présence et la télécommande sont prévus, la prise connectée est déjà appairée.</p>
     </div>
   </header>
 
@@ -55,7 +55,7 @@ const toc = [
           <div class="item"><b>Clé Zigbee</b><span>Sonoff Zigbee 3.0 USB Dongle Plus (ZBDongle-P), sur une rallonge USB</span></div>
           <div class="item"><b>Tablette</b><span>L'écran et l'appareil photo de la borne</span></div>
           <div class="item s"><b>Capteur de présence (prévu)</b><span>Face à l'emplacement des invités</span></div>
-          <div class="item s"><b>Température et humidité (prévu)</b><span>À l'intérieur de la structure</span></div>
+          <div class="item"><b>Détecteur SNZB-04P</b><span>Appareil d'essai, pour tester l'appairage</span></div>
           <div class="item a"><b>Prise SONOFF S60ZBTPF</b><span>Avec la lampe de la borne branchée dessus</span></div>
           <div class="item c"><b>Télécommande (prévue)</b><span>Pour la veille et le réveil</span></div>
           <div class="item"><b>Une connexion Internet</b><span>Wi-Fi de la salle ou partage de connexion : le Pi envoie ses mesures à l'API en ligne</span></div>
@@ -115,7 +115,6 @@ docker logs -f manora-live-passerelle</code></pre>
         <p class="tip"><b>Un capteur que la borne ne connaît pas</b> fonctionne aussi : ses valeurs s'affichent automatiquement et peuvent servir dans une règle.</p>
         <div class="place">
           <div><b>Présence</b><span>À hauteur de taille, face aux invités</span></div>
-          <div><b>Température</b><span>Dans la structure, près de la tablette</span></div>
           <div><b>Prise connectée</b><span>Entre la lampe de la borne et le secteur</span></div>
         </div>
       </section>
@@ -332,7 +331,7 @@ docker logs -f manora-live-passerelle</code></pre>
     border-radius: 0 12px 12px 0;
   }
 
-  .place { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .place { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
   .place div { padding: 16px; border-radius: var(--radius-sm); background: var(--mint-soft); font-size: 14px; line-height: 1.4; }
   .place b { display: block; margin-bottom: 4px; }
   .place span { color: var(--ink-light); }

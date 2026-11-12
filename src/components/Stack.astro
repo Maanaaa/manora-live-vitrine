@@ -51,8 +51,8 @@ const hardware = [
   { t: 'Clé Zigbee Sonoff Dongle Plus', d: 'ZBDongle-P, puce TI CC2652P, en USB', k: '' },
   { t: 'Prise connectée SONOFF S60ZBTPF', d: 'Allume la lumière de la borne, mesure puissance, tension, énergie', k: 'Appairée' },
   { t: 'Capteur de présence', d: 'Lance le décompte quand quelqu’un se place devant la borne', k: 'Prévu' },
-  { t: 'Capteur température / humidité', d: 'Alerte au-delà de 40 °C dans la structure', k: 'Prévu' },
   { t: 'Télécommande Zigbee', d: 'Veille et réveil de la borne', k: 'Prévu' },
+  { t: 'Détecteur d’ouverture SNZB-04P', d: 'Appareil d’essai, appairé pour les tests', k: 'Essai' },
   { t: 'Tablette', d: 'L’écran et l’appareil photo de la borne (app en mode borne)', k: '' },
   { t: 'Téléphones des invités', d: 'App en mode invité, ou simple navigateur pour une photo', k: '' },
 ];
@@ -85,12 +85,12 @@ const hardware = [
     <div class="hw" id="materiel">
       <div>
         <h3 class="h3">Le matériel</h3>
-        <p class="muted">La prise est appairée et testée sur le Pi. Le capteur de présence, la sonde de température et la télécommande sont prévus et pris en charge par la découverte générique, sans code spécifique.</p>
+        <p class="muted">La prise est appairée et testée sur le Pi. Le capteur de présence et la télécommande sont prévus et pris en charge par la découverte générique, sans code spécifique.</p>
       </div>
       <ul class="hw-list">
         {hardware.map((h) => (
           <li>
-            <b>{h.t}{h.k && <span class:list={['tag', h.k === 'Prévu' && 'plan']}>{h.k}</span>}</b>
+            <b>{h.t}{h.k && <span class:list={['tag', h.k !== 'Appairée' && 'plan']}>{h.k}</span>}</b>
             <span>{h.d}</span>
           </li>
         ))}

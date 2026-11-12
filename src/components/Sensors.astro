@@ -52,15 +52,6 @@
         <ul class="rules"><li><span>Un appui</span><b>veille ou réveil</b></li></ul>
       </article>
 
-      <article class="tile t-temp" data-reveal data-inview data-repeat style="--d:100">
-        <div class="viz" aria-hidden="true">
-          <div class="tube"><span></span></div>
-          <p class="deg"><span class="num"></span> °C</p>
-        </div>
-        <div class="meta"><span class="kind">Capteur</span><h3>Température et humidité</h3></div>
-        <ul class="rules"><li><span>Plus de 40 °C dans la structure</span><b>alerte au client</b></li></ul>
-      </article>
-
       <article class="tile t-new" data-reveal data-inview data-repeat style="--d:200">
         <div class="viz" aria-hidden="true">
           <div class="pair">
@@ -68,7 +59,7 @@
             <span class="arrow"></span>
             <div class="found">
               <b>Nouvel appareil</b>
-              <span class="cap">humidité · 54 %</span>
+              <span class="cap">contact · fermé</span>
               <span class="cap">batterie · 92 %</span>
             </div>
           </div>
@@ -78,7 +69,7 @@
       </article>
     </div>
 
-    <p class="status" data-reveal>Aujourd’hui, la prise connectée est appairée et testée sur le Pi. Le capteur de présence, la sonde de température et la télécommande sont prévus : ils sont pris en charge par la découverte générique, sans code spécifique.</p>
+    <p class="status" data-reveal>Aujourd’hui, la prise connectée est appairée et testée sur le Pi. Le capteur de présence et la télécommande sont prévus : ils sont pris en charge par la découverte générique, sans code spécifique.</p>
 
     <div class="notifs" data-reveal>
       <div class="notifs-copy">
@@ -87,7 +78,7 @@
       </div>
       <div class="feed" aria-hidden="true">
         <div class="n n1"><span class="ic">☾</span><div><b>La borne est en veille</b><small>Personne depuis 10 min</small></div></div>
-        <div class="n n2"><span class="ic sun">!</span><div><b>Température élevée</b><small>41 °C dans la structure</small></div></div>
+        <div class="n n2"><span class="ic sun">☀</span><div><b>La borne est réveillée</b><small>Appui sur la télécommande</small></div></div>
         <div class="n n3"><span class="ic coral">+</span><div><b>Nouvel appareil détecté</b><small>Disponible dans vos règles</small></div></div>
       </div>
     </div>
@@ -124,6 +115,7 @@
   }
   .tile:hover { border-color: rgba(169, 222, 210, .4); }
   .t-pir { grid-row: span 2; }
+  .t-new { grid-column: span 2; }
 
 
   .viz {
@@ -253,33 +245,6 @@
   @keyframes moon { 0%, 24% { opacity: 0; transform: rotate(-90deg) scale(.5); } 30%, 72% { opacity: 1; transform: none; } 76%, 100% { opacity: 0; transform: rotate(90deg) scale(.5); } }
   @keyframes sunA { 0%, 24% { opacity: 1; transform: none; } 30%, 72% { opacity: 0; transform: rotate(90deg) scale(.5); } 78%, 100% { opacity: 1; transform: none; } }
 
-  /* Température : compteur CSS */
-  @property --t {
-    syntax: '<integer>';
-    inherits: true;
-    initial-value: 24;
-  }
-  .t-temp .viz { display: flex; gap: 22px; justify-content: center; align-items: center; --t: 24; }
-  .t-temp.is-in .viz { animation: temp 6s ease-in-out infinite; }
-  @keyframes temp {
-    0%, 10% { --t: 24; }
-    55%, 75% { --t: 41; }
-    100% { --t: 24; }
-  }
-  .tube { width: 16px; height: 100px; border-radius: 99px; background: rgba(255, 255, 255, .1); position: relative; overflow: hidden; }
-  .tube span {
-    position: absolute;
-    inset: auto 0 0;
-    height: calc((var(--t) - 15) * 3%);
-    background: linear-gradient(to top, var(--sun), var(--coral));
-    border-radius: inherit;
-  }
-  .deg { font-size: 44px; font-weight: 800; letter-spacing: -.04em; color: #fff; }
-  .num { counter-reset: t var(--t); }
-  .num::after { content: counter(t); }
-  .t-temp.is-in .deg { animation: hot 6s ease-in-out infinite; }
-  @keyframes hot { 0%, 45% { color: #fff; } 55%, 75% { color: var(--coral-light); } 85%, 100% { color: #fff; } }
-
   /* Capteur inconnu : appairage */
   .pair { display: flex; align-items: center; gap: 18px; }
   .dev {
@@ -397,11 +362,12 @@
     .intro { grid-template-columns: 1fr; gap: 20px; }
     .bento { grid-template-columns: 1fr 1fr; }
     .t-pir { grid-row: auto; grid-column: span 2; }
+    .t-new { grid-column: span 2; }
     .notifs { grid-template-columns: 1fr; }
   }
   @media (max-width: 600px) {
     .bento { grid-template-columns: 1fr; }
-    .t-pir { grid-column: auto; }
+    .t-pir, .t-new { grid-column: auto; }
     .notifs { padding: 24px; }
   }
 </style>
