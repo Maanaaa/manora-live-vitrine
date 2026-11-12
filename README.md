@@ -12,7 +12,7 @@ npm run build    # site statique dans dist/, à déposer sur le VPS
 
 ## Pages
 
-- `/` : présentation, parcours d'un invité, capteurs et règles, architecture, galerie, démo, FAQ, contact
+- `/` : présentation, parcours d'un invité, capteurs et règles, architecture, technique (briques, matériel, dépôts), RGPD, galerie, démo, FAQ, contact
 - `/installation` : documentation d'installation de la borne
 
 ## À compléter

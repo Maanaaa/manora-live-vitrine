@@ -15,7 +15,7 @@ const toc = [
 ---
 <Base
   title="Installer la borne · Manora Live"
-  description="Documentation d'installation de la borne Manora Live : Raspberry Pi, services Docker, Wi-Fi local, capteurs Zigbee et tablette."
+  description="Documentation d'installation de la borne Manora Live : Raspberry Pi, services du Pi, passerelle Docker, capteurs Zigbee et tablette."
 >
   <div class="progress" aria-hidden="true"><span></span></div>
 
@@ -33,7 +33,7 @@ const toc = [
         De la carte SD vierge à la borne prête pour la soirée. Le Raspberry Pi s'installe une seule fois ;
         ensuite, une soirée se résume à brancher, allumer et vérifier que tout remonte.
       </p>
-      <p class="note" data-reveal style="--d:400">Documentation en cours de rédaction : elle suit l'avancement du projet.</p>
+      <p class="note" data-reveal style="--d:400">Documentation qui suit l'avancement du projet : le capteur de présence et la télécommande sont prévus, la prise connectée est déjà appairée.</p>
     </div>
   </header>
 
@@ -52,13 +52,13 @@ const toc = [
         <h2><span>01</span>Le matériel</h2>
         <div class="kit">
           <div class="item"><b>Raspberry Pi</b><span>Avec son alimentation et une carte micro SD</span></div>
-          <div class="item"><b>Clé Zigbee</b><span>Le coordinateur, sur une rallonge USB</span></div>
-          <div class="item"><b>Tablette Android</b><span>L'écran et l'appareil photo de la borne</span></div>
-          <div class="item s"><b>Capteur de présence</b><span>Face à l'emplacement des invités</span></div>
-          <div class="item s"><b>Température et humidité</b><span>À l'intérieur de la structure</span></div>
-          <div class="item a"><b>Prise connectée</b><span>Avec la lampe de la borne branchée dessus</span></div>
-          <div class="item c"><b>Télécommande</b><span>Pour la veille et le réveil</span></div>
-          <div class="item"><b>Une connexion Internet</b><span>Wi-Fi de la salle ou partage de connexion</span></div>
+          <div class="item"><b>Clé Zigbee</b><span>Sonoff Zigbee 3.0 USB Dongle Plus (ZBDongle-P), sur une rallonge USB</span></div>
+          <div class="item"><b>Tablette</b><span>L'écran et l'appareil photo de la borne</span></div>
+          <div class="item s"><b>Capteur de présence (prévu)</b><span>Face à l'emplacement des invités</span></div>
+          <div class="item"><b>Caméra de la tablette</b><span>Détecte le bras levé : rien à installer de plus</span></div>
+          <div class="item a"><b>Prise SONOFF S60ZBTPF</b><span>Avec la lampe de la borne branchée dessus</span></div>
+          <div class="item c"><b>Télécommande (prévue)</b><span>Pour lancer la photo, ou mettre la borne en veille</span></div>
+          <div class="item"><b>Une connexion Internet</b><span>Wi-Fi de la salle ou partage de connexion : le Pi envoie ses mesures à l'API en ligne</span></div>
         </div>
       </section>
 
@@ -67,53 +67,54 @@ const toc = [
         <ol class="steps">
           <li>Installez <b>Raspberry Pi OS Lite (64 bits)</b> avec Raspberry Pi Imager, en réglant le nom d'hôte, l'utilisateur, le Wi-Fi et SSH dès l'écriture de la carte.</li>
           <li>Branchez la clé Zigbee sur une rallonge USB, loin des ports USB 3, puis démarrez le Pi.</li>
-          <li>Installez Docker et repérez la clé Zigbee :</li>
+          <li>Installez Docker, puis Zigbee2MQTT et Mosquitto en services (Mosquitto protégé par identifiants, limité à 127.0.0.1, avec un compte <code>passerelle</code>). Repérez la clé Zigbee :</li>
         </ol>
         <pre><code><span class="c"># sur le Pi</span>
 curl -fsSL https://get.docker.com | sh
 sudo usermod -aG docker $USER
 ls -l /dev/serial/by-id/</code></pre>
         <ol class="steps" start="4">
-          <li>Récupérez le projet et créez le fichier de configuration à partir de l'exemple :</li>
+          <li>Récupérez la passerelle et créez le fichier de configuration à partir de l'exemple :</li>
         </ol>
-        <pre><code>git clone &lt;dépôt du terminal&gt; manora-terminal
-cd manora-terminal
-cp .env.example .env   <span class="c"># puis renseignez les secrets</span></code></pre>
+        <pre><code>git clone https://github.com/Maanaaa/manora-live-terminal.git ~/manora-live-terminal
+cd ~/manora-live-terminal
+cp .env.example .env   <span class="c"># renseignez TERMINAL_KEY et MQTT_PASSWORD</span></code></pre>
         <p class="tip"><b>Les secrets</b> restent dans <code>.env</code>, qui n'est jamais versionné.</p>
       </section>
 
       <section id="services" data-sec>
         <h2><span>03</span>Lancer les services</h2>
-        <p>Sur le Pi, trois conteneurs Docker redémarrent seuls à chaque allumage :</p>
-        <pre><code>docker compose up -d</code></pre>
+        <p>Sur le Pi, deux services système et un conteneur Docker redémarrent seuls à chaque allumage. La passerelle se lance avec :</p>
+        <pre><code>docker compose up -d --build
+docker logs -f manora-live-passerelle</code></pre>
         <div class="svc">
-          <div><code>zigbee2mqtt</code><span>Pilote les appareils Zigbee</span></div>
-          <div><code>mosquitto</code><span>Broker MQTT, protégé par identifiant, jamais exposé</span></div>
-          <div><code>passerelle</code><span>Format commun, file locale, envoi à l'API</span></div>
+          <div><code>zigbee2mqtt</code><span>Service systemd : pilote les appareils Zigbee</span></div>
+          <div><code>mosquitto</code><span>Service systemd : broker MQTT, protégé par identifiants, jamais exposé</span></div>
+          <div><code>passerelle</code><span>Conteneur Docker : format commun, file locale, envoi à l'API</span></div>
         </div>
+        <p class="tip"><b>Mise à jour :</b> <code>git pull &amp;&amp; docker compose up -d --build</code> dans le dossier de la passerelle. Elle ne se déploie pas toute seule, car GitHub ne peut pas joindre le Pi.</p>
       </section>
 
       <section id="serveur" data-sec>
         <h2><span>04</span>Relier la borne au serveur</h2>
         <ol class="steps">
-          <li>Dans le back-office, ajoutez un terminal : une clé propre à cette borne est créée.</li>
-          <li>Renseignez l'adresse de l'API et cette clé dans le <code>.env</code> du Pi, puis relancez la passerelle.</li>
+          <li>La clé du terminal est définie côté serveur (variables <code>TERMINAL_ID</code> et <code>TERMINAL_KEY</code> de l'API).</li>
+          <li>Reportez-la dans le <code>.env</code> du Pi, avec l'adresse de l'API, puis relancez la passerelle.</li>
           <li>La borne apparaît <b>en ligne</b> dans le back-office : elle envoie un signe de vie régulier.</li>
         </ol>
-        <p class="tip"><b>Connexion coupée ?</b> La passerelle garde les événements dans une file locale et les renvoie dans l'ordre au retour du réseau.</p>
+        <p class="tip"><b>Connexion coupée ?</b> La passerelle garde les mesures dans une file locale sur disque et les renvoie au retour du réseau.</p>
       </section>
 
       <section id="capteurs" data-sec>
         <h2><span>05</span>Appairer les capteurs</h2>
         <ol class="steps">
-          <li>Dans le back-office, lancez l'appairage sur la borne.</li>
+          <li>Dans le back-office, page Parc, lancez l'appairage sur le terminal : il reste ouvert quelques minutes, avec un décompte.</li>
           <li>Mettez chaque appareil en mode appairage (souvent un appui long sur son bouton).</li>
-          <li>Il apparaît dans la liste avec ses mesures. Donnez-lui un nom parlant et un emplacement : <code>presence-borne</code>, <code>prise-lumiere</code>…</li>
+          <li>Il apparaît dans la liste avec ses mesures. Donnez-lui un nom parlant et un emplacement : <code>prise-lumiere</code>, <code>presence-borne</code>…</li>
         </ol>
         <p class="tip"><b>Un capteur que la borne ne connaît pas</b> fonctionne aussi : ses valeurs s'affichent automatiquement et peuvent servir dans une règle.</p>
         <div class="place">
           <div><b>Présence</b><span>À hauteur de taille, face aux invités</span></div>
-          <div><b>Température</b><span>Dans la structure, près de la tablette</span></div>
           <div><b>Prise connectée</b><span>Entre la lampe de la borne et le secteur</span></div>
         </div>
       </section>
@@ -121,8 +122,8 @@ cp .env.example .env   <span class="c"># puis renseignez les secrets</span></cod
       <section id="tablette" data-sec>
         <h2><span>06</span>Associer la tablette</h2>
         <ol class="steps">
-          <li>Installez l'application Manora sur la tablette et ouvrez-la en mode borne.</li>
-          <li>Connectez-vous avec le compte de l'événement : la tablette se rattache à la borne.</li>
+          <li>Dans le back-office, page Clés des bornes, créez une clé : elle n'est affichée qu'une seule fois.</li>
+          <li>Sur la tablette, ouvrez l'application Manora, puis Réglages : activez le mode borne et collez la clé. L'app passe en paysage ; on en sort par un appui long sur le logo.</li>
           <li>Faites une photo test : elle doit apparaître dans la galerie de l'app en quelques secondes.</li>
         </ol>
       </section>
@@ -130,21 +131,21 @@ cp .env.example .env   <span class="c"># puis renseignez les secrets</span></cod
       <section id="verifier" data-sec>
         <h2><span>07</span>Vérifier avant la soirée</h2>
         <ul class="check">
-          <li>La borne et tous ses capteurs sont indiqués en ligne dans le back-office, batteries comprises.</li>
-          <li>Rester devant la borne lance le décompte et allume la lumière.</li>
-          <li>Souffler sur le capteur de température fait bouger la valeur dans l'app, sans rafraîchir.</li>
-          <li>Une règle de test envoie bien une notification au téléphone du client.</li>
-          <li>La télécommande met la borne en veille, puis la réveille.</li>
+          <li>Le terminal et la prise sont indiqués en ligne dans le back-office.</li>
+          <li>La prise s'allume et s'éteint depuis la fiche de l'appareil, avec son état réel.</li>
+          <li>Le décompte démarre au toucher de l'écran et en levant la main. Une fois appairés, le capteur de présence (règle « présence depuis 5 s ») et la télécommande (règle configurée) le lancent aussi, la lumière s'allume.</li>
+          <li>Une mesure de la prise (puissance) bouge dans le back-office sans rafraîchir la page.</li>
+          <li>Une photo prise sur la tablette apparaît dans la galerie d'un téléphone invité.</li>
         </ul>
       </section>
 
       <section id="depannage" data-sec>
         <h2><span>08</span>Dépannage</h2>
         <div class="faq">
-          <div><b>La borne apparaît hors ligne</b><p>Vérifiez la connexion Internet du Pi. Les événements de la soirée ne sont pas perdus : ils partiront dès que la connexion reviendra.</p></div>
-          <div><b>Le décompte se déclenche trop tôt ou trop tard</b><p>Ajustez le délai de la règle de présence dans l'app ou le back-office. Le décompte peut aussi être annulé.</p></div>
-          <div><b>Un capteur ne répond plus</b><p>Vérifiez sa pile dans l'app, puis rapprochez-le de la clé Zigbee. Les capteurs à pile « dorment » et peuvent mettre quelques secondes à répondre.</p></div>
-          <div><b>Les heures des événements sont fausses</b><p>L'horloge du Pi n'est pas synchronisée : vérifiez sa connexion, il se remet à l'heure tout seul une fois en ligne.</p></div>
+          <div><b>La borne apparaît hors ligne</b><p>Vérifiez la connexion Internet du Pi et les journaux de la passerelle. Les mesures de la soirée ne sont pas perdues : elles partiront dès que la connexion reviendra.</p></div>
+          <div><b>Le décompte se déclenche trop tôt ou trop tard</b><p>Ajustez la durée de la règle de présence dans le back-office.</p></div>
+          <div><b>Un capteur ne répond plus</b><p>Vérifiez sa pile dans le back-office, puis rapprochez-le de la clé Zigbee. Les capteurs à pile « dorment » et peuvent mettre quelques secondes à répondre.</p></div>
+          <div><b>Les heures des événements sont fausses</b><p>L'heure des événements est celle du Pi : vérifiez sa connexion Internet pour qu'il se remette à l'heure.</p></div>
         </div>
       </section>
     </article>
@@ -330,7 +331,7 @@ cp .env.example .env   <span class="c"># puis renseignez les secrets</span></cod
     border-radius: 0 12px 12px 0;
   }
 
-  .place { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .place { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
   .place div { padding: 16px; border-radius: var(--radius-sm); background: var(--mint-soft); font-size: 14px; line-height: 1.4; }
   .place b { display: block; margin-bottom: 4px; }
   .place span { color: var(--ink-light); }

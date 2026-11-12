@@ -8,8 +8,8 @@
         <h2 class="h2 split">Une borne qui <span class="serif">veille</span> toute seule.</h2>
       </div>
       <p class="lead" data-reveal style="--d:200">
-        Des appareils Zigbee discrets sont posés sur la borne. Chacun déclenche une règle simple,
-        « si… alors… », et le client est prévenu sur son téléphone quand il le faut.
+        Des appareils Zigbee discrets sont posés sur la borne. Chacun peut déclencher une règle simple,
+        « si… alors… », créée dans le back-office.
       </p>
     </div>
 
@@ -49,16 +49,20 @@
           <div class="mode"><span class="moon">☾</span><span class="sun">☀</span></div>
         </div>
         <div class="meta"><span class="kind kind--c">Commande</span><h3>Télécommande</h3></div>
-        <ul class="rules"><li><span>Un appui</span><b>veille ou réveil</b></li></ul>
+        <ul class="rules"><li><span>Un appui sur la télécommande</span><b>décompte, veille ou réveil</b></li></ul>
       </article>
 
-      <article class="tile t-temp" data-reveal data-inview data-repeat style="--d:100">
+      <article class="tile t-cam" data-reveal data-inview data-repeat style="--d:100">
         <div class="viz" aria-hidden="true">
-          <div class="tube"><span></span></div>
-          <p class="deg"><span class="num"></span> °C</p>
+          <svg class="figure" viewBox="0 0 80 100" width="80" height="100">
+            <circle cx="40" cy="22" r="11" class="body" />
+            <path d="M40 34v34M40 68l-12 26M40 68l12 26M40 44l-17 16" class="body" />
+            <path class="arm" d="M40 44l17 0" />
+          </svg>
+          <span class="scan"></span>
         </div>
-        <div class="meta"><span class="kind">Capteur</span><h3>Température et humidité</h3></div>
-        <ul class="rules"><li><span>Plus de 40 °C dans la structure</span><b>alerte au client</b></li></ul>
+        <div class="meta"><span class="kind">Détecteur</span><h3>Caméra de la tablette</h3></div>
+        <ul class="rules"><li><span>Bras levé 0,5 s</span><b>décompte</b></li></ul>
       </article>
 
       <article class="tile t-new" data-reveal data-inview data-repeat style="--d:200">
@@ -68,7 +72,7 @@
             <span class="arrow"></span>
             <div class="found">
               <b>Nouvel appareil</b>
-              <span class="cap">humidité · 54 %</span>
+              <span class="cap">présence · oui</span>
               <span class="cap">batterie · 92 %</span>
             </div>
           </div>
@@ -78,14 +82,16 @@
       </article>
     </div>
 
+    <p class="status" data-reveal>Aujourd’hui, la prise connectée est appairée et testée sur le Pi. Le capteur de présence et la télécommande sont prévus : ils sont pris en charge par la découverte générique, sans code spécifique. La caméra de la tablette, elle, détecte le bras levé sans aucun appareil Zigbee.</p>
+
     <div class="notifs" data-reveal>
       <div class="notifs-copy">
-        <h3 class="h3">Les règles se changent depuis l'app, <span class="serif">sans toucher au code.</span></h3>
-        <p class="muted-d">Elles sont enregistrées sur le serveur et s'appliquent aussitôt, sans redéployer quoi que ce soit.</p>
+        <h3 class="h3">Les règles se changent depuis le back-office, <span class="serif">sans toucher au code.</span></h3>
+        <p class="muted-d">Elles sont enregistrées sur le serveur et s'appliquent aussitôt, sans redéployer quoi que ce soit. Exemples de notifications :</p>
       </div>
       <div class="feed" aria-hidden="true">
         <div class="n n1"><span class="ic">☾</span><div><b>La borne est en veille</b><small>Personne depuis 10 min</small></div></div>
-        <div class="n n2"><span class="ic sun">!</span><div><b>Température élevée</b><small>41 °C dans la structure</small></div></div>
+        <div class="n n2"><span class="ic sun">✓</span><div><b>Règle déclenchée</b><small>Présence depuis 5 s</small></div></div>
         <div class="n n3"><span class="ic coral">+</span><div><b>Nouvel appareil détecté</b><small>Disponible dans vos règles</small></div></div>
       </div>
     </div>
@@ -251,32 +257,15 @@
   @keyframes moon { 0%, 24% { opacity: 0; transform: rotate(-90deg) scale(.5); } 30%, 72% { opacity: 1; transform: none; } 76%, 100% { opacity: 0; transform: rotate(90deg) scale(.5); } }
   @keyframes sunA { 0%, 24% { opacity: 1; transform: none; } 30%, 72% { opacity: 0; transform: rotate(90deg) scale(.5); } 78%, 100% { opacity: 1; transform: none; } }
 
-  /* Température : compteur CSS */
-  @property --t {
-    syntax: '<integer>';
-    inherits: true;
-    initial-value: 24;
-  }
-  .t-temp .viz { display: flex; gap: 22px; justify-content: center; align-items: center; --t: 24; }
-  .t-temp.is-in .viz { animation: temp 6s ease-in-out infinite; }
-  @keyframes temp {
-    0%, 10% { --t: 24; }
-    55%, 75% { --t: 41; }
-    100% { --t: 24; }
-  }
-  .tube { width: 16px; height: 100px; border-radius: 99px; background: rgba(255, 255, 255, .1); position: relative; overflow: hidden; }
-  .tube span {
-    position: absolute;
-    inset: auto 0 0;
-    height: calc((var(--t) - 15) * 3%);
-    background: linear-gradient(to top, var(--sun), var(--coral));
-    border-radius: inherit;
-  }
-  .deg { font-size: 44px; font-weight: 800; letter-spacing: -.04em; color: #fff; }
-  .num { counter-reset: t var(--t); }
-  .num::after { content: counter(t); }
-  .t-temp.is-in .deg { animation: hot 6s ease-in-out infinite; }
-  @keyframes hot { 0%, 45% { color: #fff; } 55%, 75% { color: var(--coral-light); } 85%, 100% { color: #fff; } }
+
+  /* Caméra : geste de la main levée */
+  .figure { position: relative; z-index: 1; }
+  .figure .body { fill: none; stroke: var(--mint); stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; }
+  .figure circle.body { fill: rgba(169, 222, 210, .15); }
+  .figure .arm { fill: none; stroke: var(--coral); stroke-width: 4; stroke-linecap: round; transform-origin: 40px 44px; }
+  .t-cam.is-in .arm { animation: raise 4s ease-in-out infinite; }
+  @keyframes raise { 0%, 20% { transform: rotate(0); } 40%, 75% { transform: rotate(-80deg); } 100% { transform: rotate(0); } }
+  .scan { position: absolute; inset: 14px; border: 2px solid rgba(169, 222, 210, .35); border-radius: 12px; }
 
   /* Capteur inconnu : appairage */
   .pair { display: flex; align-items: center; gap: 18px; }
@@ -330,6 +319,7 @@
   }
 
   /* Flux de notifications */
+  .status { margin-top: 18px; font-size: 15px; color: rgba(255, 250, 241, .8); max-width: 80ch; }
   .notifs {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -394,7 +384,7 @@
     .intro { grid-template-columns: 1fr; gap: 20px; }
     .bento { grid-template-columns: 1fr 1fr; }
     .t-pir { grid-row: auto; grid-column: span 2; }
-    .notifs { grid-template-columns: 1fr; }
+      .notifs { grid-template-columns: 1fr; }
   }
   @media (max-width: 600px) {
     .bento { grid-template-columns: 1fr; }

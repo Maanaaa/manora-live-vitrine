@@ -16,7 +16,7 @@ import borneEcran from '../assets/borne-ecran-mariage.jpg';
       <p class="eyebrow" data-reveal>La borne photo Manora, version connectée</p>
       <h1 class="h1 split">Les photos de la soirée, <span class="serif accent">en direct.</span></h1>
       <p class="lead" data-reveal style="--d:500">
-        Vos invités récupèrent leur photo en scannant un QR code, pendant la soirée.
+        Vos invités lancent leur photo d'un geste de la main, d'un toucher ou d'un pas devant la borne, puis la récupèrent en scannant un QR code, pendant la soirée.
         Et la borne se gère seule grâce à ses capteurs.
       </p>
       <div class="actions" data-reveal style="--d:650">
@@ -31,8 +31,8 @@ import borneEcran from '../assets/borne-ecran-mariage.jpg';
       </div>
       <ul class="badges" data-reveal style="--d:800">
         <li><span>1</span> QR code pour sa photo</li>
-        <li><span>4</span> appareils connectés</li>
-        <li><span>0</span> photo perdue si la connexion coupe</li>
+        <li><span>3</span> types d’appareils Zigbee</li>
+        <li><span>30</span> jours de conservation des mesures</li>
       </ul>
     </div>
 
@@ -49,9 +49,9 @@ import borneEcran from '../assets/borne-ecran-mariage.jpg';
         <div><b>Présence détectée</b><small>Décompte dans 3 s</small></div>
       </div>
 
-      <div class="card c-temp" data-depth="0.3" aria-hidden="true">
-        <div class="thermo"><span></span></div>
-        <div><b>31 °C</b><small>Dans la structure</small></div>
+      <div class="card c-remote" data-depth="0.3" aria-hidden="true">
+        <span class="lamp-ic remote-ic">▶</span>
+        <div><b>Décompte lancé</b><small>Un appui sur la télécommande</small></div>
       </div>
 
       <div class="card c-light" data-depth="0.4" aria-hidden="true">
@@ -248,25 +248,8 @@ import borneEcran from '../assets/borne-ecran-mariage.jpg';
     to { transform: scale(1.5); opacity: 0; }
   }
 
-  .c-temp { top: 48%; right: -14%; animation-delay: 1.3s; }
-  .thermo {
-    width: 10px;
-    height: 34px;
-    border-radius: 99px;
-    background: var(--cream);
-    position: relative;
-    overflow: hidden;
-    margin-inline: 6px 2px;
-  }
-  .thermo span {
-    position: absolute;
-    inset: auto 0 0;
-    height: 55%;
-    background: linear-gradient(var(--sun), var(--coral));
-    border-radius: inherit;
-    animation: heroTemp 5s ease-in-out infinite alternate;
-  }
-  @keyframes heroTemp { from { height: 40%; } to { height: 70%; } }
+  .c-remote { top: 48%; right: -14%; animation-delay: 1.3s; }
+  .remote-ic { font-size: 18px; line-height: 1; color: var(--wood); }
 
   .c-light { top: 4%; left: 2%; animation-delay: 1.5s; }
   .lamp-ic {
@@ -356,7 +339,7 @@ import borneEcran from '../assets/borne-ecran-mariage.jpg';
     .grid { grid-template-columns: 1fr; }
     .visual { max-width: 380px; margin-top: 20px; }
     .c-presence { left: -6%; }
-    .c-temp { right: -6%; }
+    .c-remote { right: -6%; }
     .phone { left: -4%; width: 250px; }
     .mark-wrap { right: -10px; }
     .mark-wrap :global(svg) { width: 80px; height: 80px; }
@@ -366,7 +349,7 @@ import borneEcran from '../assets/borne-ecran-mariage.jpg';
     .visual { max-width: 300px; }
     .card { font-size: 13px; padding: 9px 12px 9px 9px; }
     .c-presence { left: -4%; top: 26%; }
-    .c-temp { right: -4%; }
+    .c-remote { right: -4%; }
     .phone { left: -2%; width: 230px; }
   }
 </style>

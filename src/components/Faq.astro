@@ -1,6 +1,10 @@
 ---
 const faq = [
   {
+    q: 'Comment lance-t-on la photo ?',
+    a: "De quatre façons, sans hiérarchie : le capteur de présence repère quelqu'un depuis 5 secondes, la caméra de la tablette détecte un bras levé (analyse sur la tablette, aucune image envoyée), un appui sur l'écran, ou un appui sur la télécommande Zigbee (règle configurable dans le back-office).",
+  },
+  {
     q: 'Comment les invités récupèrent-ils leurs photos ?',
     a: "En scannant le QR code affiché après chaque photo. Elle s'ouvre directement dans le navigateur du téléphone, et la galerie de la soirée se met à jour en direct.",
   },
@@ -10,15 +14,15 @@ const faq = [
   },
   {
     q: 'Et si la connexion coupe pendant la soirée ?',
-    a: "La borne garde les événements et les photos dans une file d'attente, puis les envoie dès que la connexion revient. Rien n'est perdu.",
+    a: "Les mesures des capteurs sont gardées sur le disque du Pi, puis renvoyées dès que la connexion revient. Les photos, elles, n'ont pas de file d'attente : si l'envoi échoue, la tablette affiche un message et l'invité peut réessayer.",
   },
   {
     q: 'Que deviennent les photos des invités ?',
-    a: "Elles sont conservées pendant une durée limitée, puis supprimées. Chaque invité peut supprimer les photos qu'il a envoyées, et le client peut modérer la galerie.",
+    a: "Elles ne sont pas effacées automatiquement : leur auteur, l'hôte ou l'administrateur les supprime, ce qui efface aussi les fichiers. Les mesures des capteurs et le journal, eux, sont purgés au bout de 30 jours. Voir la section RGPD.",
   },
   {
     q: 'Comment suis-je prévenu si la borne a un souci ?',
-    a: "Par une notification sur votre téléphone : température trop élevée dans la structure, borne mise en veille faute d'invités, appareil hors ligne.",
+    a: "Les règles (par exemple borne mise en veille faute d'invités) peuvent notifier le client via Expo Push, et tout est visible dans le journal du back-office. L'écran du client dans l'app mobile n'existe pas encore : c'est la prochaine étape.",
   },
   {
     q: 'La borne imprime-t-elle les photos ?',

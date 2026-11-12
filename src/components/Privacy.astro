@@ -1,0 +1,59 @@
+---
+const gh = 'https://github.com/Maanaaa/manora-live-api/blob/main/docs/adr/0005-donnees-et-rgpd.md';
+---
+<section class="section privacy" id="rgpd">
+  <div class="wrap">
+    <p class="eyebrow" data-reveal>Vie privée et RGPD</p>
+    <h2 class="h2 split">Peu de données, <span class="serif">gardées peu de temps.</span></h2>
+    <p class="lead" data-reveal style="--d:200">
+      Les photos d’invités et les mesures des capteurs sont des données personnelles. Voici ce qui est enregistré, et combien de temps.
+    </p>
+
+    <div class="cards">
+      <article data-reveal>
+        <span class="k">Collecté</span>
+        <h3 class="h3">Le strict nécessaire</h3>
+        <ul>
+          <li>Un invité n’a ni e-mail ni mot de passe : seulement un identifiant lié à l’événement, avec un nom facultatif.</li>
+          <li>Mots de passe hachés, clés d’API gardées sous forme d’empreinte uniquement.</li>
+          <li>Les photos sont des fichiers à adresse aléatoire, listés seulement pour les invités de l’événement.</li>
+        </ul>
+      </article>
+      <article data-reveal style="--d:100">
+        <span class="k">Conservation</span>
+        <h3 class="h3">30 jours, purge automatique</h3>
+        <ul>
+          <li>Les mesures des capteurs et le journal plus vieux que <strong>30 jours</strong> sont supprimés chaque jour.</li>
+          <li>30 jours suffisent pour comprendre un incident après une soirée, sans garder un historique de présence plus longtemps que nécessaire. La durée se règle par variable.</li>
+          <li><strong>Les photos ne sont pas purgées automatiquement</strong> : leur auteur, l’hôte ou l’administrateur les supprime, et les fichiers sont alors effacés.</li>
+        </ul>
+      </article>
+      <article data-reveal style="--d:200">
+        <span class="k">Sur la tablette</span>
+        <h3 class="h3">La main levée reste chez vous</h3>
+        <ul>
+          <li>Pour lancer la photo en levant la main, l’analyse de l’image se fait sur la tablette.</li>
+          <li><strong>Aucune image n’est envoyée</strong> pour cette détection.</li>
+          <li>Les photos ne partent vers le serveur qu’au moment où l’invité valide son envoi.</li>
+        </ul>
+      </article>
+    </div>
+    <p class="more" data-reveal><a href={gh}>Lire la décision « Données et RGPD » (ADR 0005)</a></p>
+  </div>
+</section>
+
+<style>
+  .privacy { background: var(--paper); }
+  .h2 .serif { color: var(--coral); }
+  .lead { margin-top: 22px; }
+  .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 56px; }
+  article { padding: 28px; background: var(--mint-soft); border: 1px solid var(--mint); border-radius: var(--radius); }
+  article:nth-child(2) { background: var(--cream-2); border-color: var(--sand); }
+  .k { font-size: 12px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: var(--teal); }
+  article:nth-child(2) .k { color: #85462f; }
+  article h3 { margin: 8px 0 14px; }
+  ul { padding-left: 18px; display: grid; gap: 10px; font-size: 15px; line-height: 1.5; color: var(--ink-light); }
+  .more { margin-top: 30px; font-weight: 700; }
+  .more a { color: var(--terracotta); text-underline-offset: 3px; }
+  @media (max-width: 960px) { .cards { grid-template-columns: minmax(0, 1fr); } }
+</style>
