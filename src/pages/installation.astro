@@ -55,9 +55,9 @@ const toc = [
           <div class="item"><b>Clé Zigbee</b><span>Sonoff Zigbee 3.0 USB Dongle Plus (ZBDongle-P), sur une rallonge USB</span></div>
           <div class="item"><b>Tablette</b><span>L'écran et l'appareil photo de la borne</span></div>
           <div class="item s"><b>Capteur de présence (prévu)</b><span>Face à l'emplacement des invités</span></div>
-          <div class="item"><b>Détecteur SNZB-04P</b><span>Appareil d'essai, pour tester l'appairage</span></div>
+          <div class="item"><b>Caméra de la tablette</b><span>Détecte le bras levé : rien à installer de plus</span></div>
           <div class="item a"><b>Prise SONOFF S60ZBTPF</b><span>Avec la lampe de la borne branchée dessus</span></div>
-          <div class="item c"><b>Télécommande (prévue)</b><span>Pour la veille et le réveil</span></div>
+          <div class="item c"><b>Télécommande (prévue)</b><span>Pour lancer la photo, ou mettre la borne en veille</span></div>
           <div class="item"><b>Une connexion Internet</b><span>Wi-Fi de la salle ou partage de connexion : le Pi envoie ses mesures à l'API en ligne</span></div>
         </div>
       </section>
@@ -133,7 +133,7 @@ docker logs -f manora-live-passerelle</code></pre>
         <ul class="check">
           <li>Le terminal et la prise sont indiqués en ligne dans le back-office.</li>
           <li>La prise s'allume et s'éteint depuis la fiche de l'appareil, avec son état réel.</li>
-          <li>Une règle « présence depuis 5 s » (une fois le capteur de présence appairé) lance le décompte sur la tablette et allume la lumière.</li>
+          <li>Le décompte démarre au toucher de l'écran et en levant la main. Une fois appairés, le capteur de présence (règle « présence depuis 5 s ») et la télécommande (règle configurée) le lancent aussi, la lumière s'allume.</li>
           <li>Une mesure de la prise (puissance) bouge dans le back-office sans rafraîchir la page.</li>
           <li>Une photo prise sur la tablette apparaît dans la galerie d'un téléphone invité.</li>
         </ul>

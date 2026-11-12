@@ -40,7 +40,7 @@ const bricks = [
     t: 'App mobile',
     role: 'Une app, deux modes : invité (galerie en direct, partage) et borne (tablette : caméra, décompte, QR).',
     tech: 'Expo SDK 57, React Native, TypeScript, expo-router, MediaPipe',
-    why: 'La borne se lance au toucher, par un capteur ou en levant la main, sans qu’aucune image ne quitte la tablette.',
+    why: 'Quatre façons de lancer le décompte : toucher, capteur de présence, télécommande ou main levée, sans qu’aucune image ne quitte la tablette.',
     repo: `${gh}/manora-live-mobile`,
     adr: `${gh}/manora-live-mobile/tree/main/docs/adr`,
     name: 'manora-live-mobile',
@@ -50,10 +50,10 @@ const hardware = [
   { t: 'Raspberry Pi 4', d: 'Le terminal, sans écran, dans la borne', k: '' },
   { t: 'Clé Zigbee Sonoff Dongle Plus', d: 'ZBDongle-P, puce TI CC2652P, en USB', k: '' },
   { t: 'Prise connectée SONOFF S60ZBTPF', d: 'Allume la lumière de la borne, mesure puissance, tension, énergie', k: 'Appairée' },
-  { t: 'Capteur de présence', d: 'Lance le décompte quand quelqu’un se place devant la borne', k: 'Prévu' },
-  { t: 'Télécommande Zigbee', d: 'Veille et réveil de la borne', k: 'Prévu' },
-  { t: 'Détecteur d’ouverture SNZB-04P', d: 'Appareil d’essai, appairé pour les tests', k: 'Essai' },
-  { t: 'Tablette', d: 'L’écran et l’appareil photo de la borne (app en mode borne)', k: '' },
+  { t: 'Capteur de présence', d: 'Lance le décompte quand quelqu’un reste devant la borne 5 secondes', k: 'Prévu' },
+  { t: 'Télécommande Zigbee', d: 'Lance la photo ; peut aussi mettre la borne en veille ou la réveiller', k: 'Prévu' },
+  { t: 'Caméra de la tablette', d: 'Détecte le bras levé (MediaPipe, sur l’appareil) : un détecteur sans Zigbee', k: '' },
+  { t: 'Tablette', d: 'L’écran tactile de la borne (app en mode borne)', k: '' },
   { t: 'Téléphones des invités', d: 'App en mode invité, ou simple navigateur pour une photo', k: '' },
 ];
 ---
