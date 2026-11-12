@@ -8,8 +8,8 @@
         <h2 class="h2 split">Une borne qui <span class="serif">veille</span> toute seule.</h2>
       </div>
       <p class="lead" data-reveal style="--d:200">
-        Des appareils Zigbee discrets sont posés sur la borne. Chacun déclenche une règle simple,
-        « si… alors… », et le client est prévenu sur son téléphone quand il le faut.
+        Des appareils Zigbee discrets sont posés sur la borne. Chacun peut déclencher une règle simple,
+        « si… alors… », créée dans le back-office.
       </p>
     </div>
 
@@ -78,10 +78,12 @@
       </article>
     </div>
 
+    <p class="status" data-reveal>Aujourd’hui, la prise connectée est appairée et testée sur le Pi. Le capteur de présence, la sonde de température et la télécommande sont prévus : ils sont pris en charge par la découverte générique, sans code spécifique.</p>
+
     <div class="notifs" data-reveal>
       <div class="notifs-copy">
-        <h3 class="h3">Les règles se changent depuis l'app, <span class="serif">sans toucher au code.</span></h3>
-        <p class="muted-d">Elles sont enregistrées sur le serveur et s'appliquent aussitôt, sans redéployer quoi que ce soit.</p>
+        <h3 class="h3">Les règles se changent depuis le back-office, <span class="serif">sans toucher au code.</span></h3>
+        <p class="muted-d">Elles sont enregistrées sur le serveur et s'appliquent aussitôt, sans redéployer quoi que ce soit. Exemples de notifications :</p>
       </div>
       <div class="feed" aria-hidden="true">
         <div class="n n1"><span class="ic">☾</span><div><b>La borne est en veille</b><small>Personne depuis 10 min</small></div></div>
@@ -330,6 +332,7 @@
   }
 
   /* Flux de notifications */
+  .status { margin-top: 18px; font-size: 15px; color: rgba(255, 250, 241, .8); max-width: 80ch; }
   .notifs {
     display: grid;
     grid-template-columns: 1fr 1fr;

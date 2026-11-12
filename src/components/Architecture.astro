@@ -1,8 +1,14 @@
 ---
-const devices = ['Présence', 'Température', 'Télécommande', 'Prise connectée', 'Tout autre capteur'];
+const devices = [
+  { n: 'Prise connectée', st: 'appairée' },
+  { n: 'Présence', st: 'prévu' },
+  { n: 'Température', st: 'prévu' },
+  { n: 'Télécommande', st: 'prévu' },
+  { n: 'Tout autre capteur', st: '' },
+];
 const terminal = [
   { name: 'Zigbee2MQTT', hl: false },
-  { name: 'Mosquitto', hl: false },
+  { name: 'Mosquitto (local)', hl: false },
   { name: 'Passerelle', hl: true },
   { name: 'File locale', hl: false },
 ];
@@ -10,23 +16,21 @@ const api = [
   { name: 'API REST', hl: true },
   { name: 'WebSocket', hl: true },
   { name: 'Moteur de règles', hl: false },
-  { name: 'Notifications push', hl: false },
-  { name: 'Auth et rôles', hl: false },
-  { name: 'Base de données', hl: false },
+  { name: 'Photos', hl: false },
+  { name: 'Notifications Expo Push', hl: false },
+  { name: 'SQLite', hl: false },
 ];
 const clients = [
   { t: 'Tablette de la borne', d: 'Caméra, décompte, QR' },
-  { t: 'App mobile', d: 'Client et invités, en direct' },
-  { t: 'Back-office', d: 'Parc, règles, utilisateurs' },
-  { t: 'Site vitrine', d: 'Vous êtes ici' },
+  { t: 'App mobile', d: 'Invités : galerie en direct' },
+  { t: 'Back-office', d: 'Parc, règles, journal' },
 ];
 const json = [
   ['p', '{'],
-  ['k', '  "terminal"', ': ', 'v', '"manora-01",'],
+  ['k', '  "terminal"', ': ', 'v', '"pi-manora",'],
   ['k', '  "device"', ': ', 'v', '"0x00158d0001a2b3c4",'],
   ['k', '  "readings"', ': {'],
-  ['k', '    "temperature"', ': ', 'v', '41.2,'],
-  ['k', '    "humidity"', ': ', 'v', '38,'],
+  ['k', '    "occupancy"', ': ', 'v', 'true,'],
   ['k', '    "battery"', ': ', 'v', '92'],
   ['p', '  },'],
   ['k', '  "ts"', ': ', 'v', '"2026-11-12T23:02:07Z"'],
@@ -46,17 +50,18 @@ const jsonHtml = json
 <section class="section arch" id="architecture">
   <div class="wrap">
     <p class="eyebrow" data-reveal>Sous le capot</p>
-    <h2 class="h2 split">Du capteur à la notification, <span class="serif">en temps réel.</span></h2>
+    <h2 class="h2 split">Du capteur à la galerie, <span class="serif">en temps réel.</span></h2>
     <p class="lead" data-reveal style="--d:200">
-      Un Raspberry Pi caché dans la borne écoute les capteurs Zigbee et traduit chaque message dans un format commun.
-      Il l'envoie à l'API Manora, qui applique les règles, prévient le client et met à jour toutes les applis en direct.
+      Un Raspberry Pi caché dans la borne écoute les appareils Zigbee et traduit chaque message dans un format commun.
+      Il l'envoie par Internet à l'API Manora, hébergée sur mon serveur. L'API applique les règles, commande la borne et
+      met à jour toutes les applis en direct.
     </p>
 
     <div class="diagram" data-inview>
       <div class="col devices" data-reveal="left">
         <p class="col-t">Appareils Zigbee</p>
         <ul>
-          {devices.map((d, i) => <li style={`--k:${i}`}><span class="led"></span>{d}</li>)}
+          {devices.map((d, i) => <li style={`--k:${i}`}><span class="led"></span>{d.n}{d.st && <small>{d.st}</small>}</li>)}
         </ul>
       </div>
 
@@ -66,7 +71,7 @@ const jsonHtml = json
         <div class="node-head">
           <span class="chip-ic" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
           <div>
-            <p class="node-t">Raspberry Pi</p>
+            <p class="node-t">Raspberry Pi 4</p>
             <p class="node-s">Le terminal, dans la borne</p>
           </div>
         </div>
@@ -82,7 +87,7 @@ const jsonHtml = json
           <span class="srv-ic" aria-hidden="true"><i></i><i></i><i></i></span>
           <div>
             <p class="node-t">API Manora</p>
-            <p class="node-s">Sur le serveur, en ligne</p>
+            <p class="node-s">Sur mon serveur (VPS), en ligne</p>
           </div>
         </div>
         <ul class="svc">
@@ -102,22 +107,22 @@ const jsonHtml = json
 
     <div class="below">
       <div class="code" data-inview>
-        <div class="code-bar"><i></i><i></i><i></i><span>Événement envoyé par la borne à l'API</span></div>
+        <div class="code-bar"><i></i><i></i><i></i><span>Exemple d'événement envoyé par la passerelle à l'API</span></div>
         <pre><code set:html={jsonHtml} /></pre>
       </div>
 
       <ul class="whys">
         <li data-reveal>
           <b>Un format commun pour tous les capteurs</b>
-          <p>La passerelle lit ce que chaque appareil sait mesurer et produit toujours le même message. Un capteur inconnu apparaît dans l'app et le back-office, avec le bon affichage, sans toucher au code.</p>
+          <p>La passerelle lit ce que chaque appareil sait faire (ses « exposes ») et produit toujours le même message. Un capteur inconnu apparaît dans le back-office, avec le bon affichage, sans toucher au code.</p>
         </li>
         <li data-reveal style="--d:100">
-          <b>Si la connexion coupe, rien n'est perdu</b>
-          <p>Les événements sont gardés dans une file sur le Pi et renvoyés dès que la connexion revient. L'API sait quand la borne ou un capteur est hors ligne.</p>
+          <b>Si Internet coupe, les mesures ne sont pas perdues</b>
+          <p>Les événements des capteurs sont gardés sur le disque du Pi et renvoyés au retour du réseau. Les photos, elles, n'ont pas de file d'attente : l'envoi échoue avec un message.</p>
         </li>
         <li data-reveal style="--d:200">
           <b>Les interfaces ne parlent qu'à l'API</b>
-          <p>Jamais directement à la borne. Chaque terminal s'authentifie avec sa propre clé, et le broker MQTT n'est jamais exposé sur Internet.</p>
+          <p>Jamais directement au Pi. Le terminal s'authentifie avec sa propre clé, et le broker MQTT, protégé par identifiants, n'écoute que sur 127.0.0.1 : il n'est jamais exposé.</p>
         </li>
       </ul>
     </div>
@@ -156,6 +161,8 @@ const jsonHtml = json
     font-weight: 700;
   }
   .devices li:last-child { border-style: dashed; color: var(--muted); }
+  .devices li small { margin-left: auto; font-size: 11px; font-weight: 700; color: var(--teal); }
+  .devices li:not(:first-child):not(:last-child) small { color: var(--muted); }
   .led { width: 8px; height: 8px; border-radius: 50%; background: var(--mint); flex-shrink: 0; }
   .is-in .led { animation: led 2.5s calc(var(--k) * .5s) infinite; }
   @keyframes led { 0%, 70%, 100% { background: var(--mint); box-shadow: none; } 80% { background: var(--coral); box-shadow: 0 0 0 4px rgba(236, 92, 70, .2); } }
@@ -320,7 +327,7 @@ const jsonHtml = json
   .whys p { color: var(--ink-light); margin-top: 6px; }
 
   @media (max-width: 1080px) {
-    .diagram { grid-template-columns: 1fr; max-width: 520px; margin-inline: auto; }
+    .diagram { grid-template-columns: minmax(0, 1fr); max-width: 520px; margin-inline: auto; }
     .link { height: 64px; }
     .flow {
       left: 50%;
@@ -338,8 +345,12 @@ const jsonHtml = json
     @keyframes pkt { 0% { top: 0; opacity: 0; } 10%, 90% { opacity: 1; } 100% { top: 100%; opacity: 0; } }
     @keyframes pktBack { 0% { top: 100%; opacity: 0; } 10%, 90% { opacity: 1; } 100% { top: 0; opacity: 0; } }
     .lbl { left: calc(50% + 14px); bottom: auto; top: 50%; transform: translateY(-50%); }
-    .devices ul, .clients { grid-template-columns: 1fr 1fr; }
+    .devices ul, .clients { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .clients .col-t { grid-column: 1 / -1; }
-    .below { grid-template-columns: 1fr; }
+    .below { grid-template-columns: minmax(0, 1fr); }
+  }
+  @media (max-width: 560px) {
+    .devices ul, .clients { grid-template-columns: minmax(0, 1fr); }
+    .pair-fix { display: none; }
   }
 </style>

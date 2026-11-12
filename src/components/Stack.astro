@@ -1,0 +1,162 @@
+---
+const gh = 'https://github.com/Maanaaa';
+const bricks = [
+  {
+    n: '1',
+    t: 'Terminal',
+    role: 'Le Raspberry Pi dans la borne : reçoit les appareils Zigbee, traduit leurs messages et les envoie à l’API.',
+    tech: 'Zigbee2MQTT 2.14, Mosquitto, passerelle Node 24 dans un conteneur Docker',
+    why: 'Découverte générique : aucun modèle de capteur n’est codé en dur. File locale sur disque si Internet coupe.',
+    repo: `${gh}/manora-live-terminal`,
+    adr: `${gh}/manora-live-terminal/tree/main/docs/adr`,
+    name: 'manora-live-terminal',
+  },
+  {
+    n: '2',
+    t: 'API',
+    role: 'Le cerveau, sur le serveur : état des appareils, règles « si… alors… », photos, temps réel.',
+    tech: 'Node 24, TypeScript, Fastify, SQLite, WebSocket, JWT',
+    why: 'Un seul point d’entrée pour toutes les interfaces. Moteur de règles testé sans base ni réseau.',
+    repo: `${gh}/manora-live-api`,
+    adr: `${gh}/manora-live-api/tree/main/docs/adr`,
+    name: 'manora-live-api',
+    live: 'https://api.live.manora-photo.fr/docs',
+    liveLabel: 'Swagger de l’API',
+  },
+  {
+    n: '3',
+    t: 'Back-office',
+    role: 'Interface d’administration : parc d’appareils, appairage, règles, utilisateurs, journal, clés des bornes.',
+    tech: 'Vite, React, TypeScript, Recharts',
+    why: 'Chaque appareil s’affiche selon le type de ses valeurs, jamais selon son modèle.',
+    repo: `${gh}/manora-live-backoffice`,
+    adr: `${gh}/manora-live-backoffice/tree/main/docs/adr`,
+    name: 'manora-live-backoffice',
+    live: 'https://admin.live.manora-photo.fr',
+    liveLabel: 'Back-office en ligne',
+  },
+  {
+    n: '4',
+    t: 'App mobile',
+    role: 'Une app, deux modes : invité (galerie en direct, partage) et borne (tablette : caméra, décompte, QR).',
+    tech: 'Expo SDK 57, React Native, TypeScript, expo-router, MediaPipe',
+    why: 'La borne se lance au toucher, par un capteur ou en levant la main, sans qu’aucune image ne quitte la tablette.',
+    repo: `${gh}/manora-live-mobile`,
+    adr: `${gh}/manora-live-mobile/tree/main/docs/adr`,
+    name: 'manora-live-mobile',
+  },
+];
+const hardware = [
+  { t: 'Raspberry Pi 4', d: 'Le terminal, sans écran, dans la borne', k: '' },
+  { t: 'Clé Zigbee Sonoff Dongle Plus', d: 'ZBDongle-P, puce TI CC2652P, en USB', k: '' },
+  { t: 'Prise connectée SONOFF S60ZBTPF', d: 'Allume la lumière de la borne, mesure puissance, tension, énergie', k: 'Appairée' },
+  { t: 'Capteur de présence', d: 'Lance le décompte quand quelqu’un se place devant la borne', k: 'Prévu' },
+  { t: 'Capteur température / humidité', d: 'Alerte au-delà de 40 °C dans la structure', k: 'Prévu' },
+  { t: 'Télécommande Zigbee', d: 'Veille et réveil de la borne', k: 'Prévu' },
+  { t: 'Tablette', d: 'L’écran et l’appareil photo de la borne (app en mode borne)', k: '' },
+  { t: 'Téléphones des invités', d: 'App en mode invité, ou simple navigateur pour une photo', k: '' },
+];
+---
+<section class="section stack" id="technique">
+  <div class="wrap">
+    <p class="eyebrow" data-reveal>La technique</p>
+    <h2 class="h2 split">Quatre briques, <span class="serif">quatre dépôts publics.</span></h2>
+    <p class="lead" data-reveal style="--d:200">
+      Chaque brique a son dépôt GitHub, son README et ses décisions d’architecture (ADR) datées&nbsp;: le « pourquoi » de chaque choix y est écrit.
+    </p>
+
+    <div class="bricks">
+      {bricks.map((b, i) => (
+        <article class="brick" data-reveal style={`--d:${i * 80}`}>
+          <span class="bn" aria-hidden="true">{b.n}</span>
+          <h3 class="h3">{b.t}</h3>
+          <p>{b.role}</p>
+          <p class="tech">{b.tech}</p>
+          <p class="why">{b.why}</p>
+          <p class="links">
+            <a href={b.repo}>Dépôt {b.name}</a>
+            <a href={b.adr}>Décisions (ADR)</a>
+            {b.live && <a href={b.live}>{b.liveLabel}</a>}
+          </p>
+        </article>
+      ))}
+    </div>
+
+    <div class="hw" id="materiel">
+      <div>
+        <h3 class="h3">Le matériel</h3>
+        <p class="muted">La prise est appairée et testée sur le Pi. Le capteur de présence, la sonde de température et la télécommande sont prévus et pris en charge par la découverte générique, sans code spécifique.</p>
+      </div>
+      <ul class="hw-list">
+        {hardware.map((h) => (
+          <li>
+            <b>{h.t}{h.k && <span class:list={['tag', h.k === 'Prévu' && 'plan']}>{h.k}</span>}</b>
+            <span>{h.d}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+
+    <div class="ops">
+      <div>
+        <h3 class="h3">Hébergement et déploiement</h3>
+        <p>L’API et le back-office tournent sur mon serveur (VPS Contabo), derrière nginx avec un certificat Let’s Encrypt. Les stacks Portainer sont branchées sur GitHub : chaque fusion sur <code>main</code> lance la CI, puis un webhook redéploie.</p>
+      </div>
+      <div>
+        <h3 class="h3">Qualité</h3>
+        <p>Dans chaque dépôt, GitHub Actions lance le lint, les types, les tests (moteur de règles et normalisation, HTTP, main levée), le build Docker, OSV-Scanner pour les failles des dépendances et gitleaks pour les secrets.</p>
+      </div>
+      <div>
+        <h3 class="h3">Auteur et IA</h3>
+        <p>Projet individuel de Théo Manya (SAÉ fil rouge IoT, BUT MMI 3). Le sujet autorise l’IA si elle est déclarée : Claude Code a servi d’assistant de développement ; les décisions, les choix et la validation sont les miens.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .stack { background: var(--cream-2); }
+  .h2 .serif { color: var(--coral); }
+  .lead { margin-top: 22px; }
+  .bricks { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; margin-top: 56px; }
+  .brick {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 26px 22px 22px;
+    background: var(--paper);
+    border: 1px solid var(--sand);
+    border-radius: var(--radius);
+    font-size: 15px;
+    line-height: 1.5;
+  }
+  .bn { position: absolute; top: 14px; right: 18px; font-size: 38px; font-weight: 800; color: var(--sand); line-height: 1; }
+  .brick p { color: var(--ink-light); }
+  .tech { font-weight: 700; color: var(--ink) !important; font-size: 14px; }
+  .why { font-size: 14px; color: var(--muted) !important; }
+  .links { margin-top: auto; padding-top: 8px; display: grid; gap: 4px; }
+  .links a { font-weight: 700; font-size: 14px; color: var(--terracotta); text-underline-offset: 3px; overflow-wrap: anywhere; }
+  .links a:hover { color: var(--ink); }
+
+  .hw { display: grid; grid-template-columns: 1fr 1.6fr; gap: 50px; margin-top: 80px; align-items: start; }
+  .hw .muted { margin-top: 10px; font-size: 16px; }
+  .hw-list { list-style: none; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .hw-list li { padding: 12px 16px; background: var(--paper); border: 1px solid var(--sand); border-radius: 14px; font-size: 14px; line-height: 1.4; }
+  .hw-list b { display: block; font-size: 15px; }
+  .hw-list span:not(.tag) { color: var(--ink-light); }
+  .tag { display: inline-block; margin-left: 8px; padding: 1px 9px; border-radius: 99px; font-size: 11px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; background: var(--mint-soft); color: var(--teal); vertical-align: 1px; }
+  .tag.plan { background: var(--cream); color: #85462f; }
+
+  .ops { display: grid; grid-template-columns: repeat(3, 1fr); gap: 36px; margin-top: 70px; padding-top: 40px; border-top: 1px solid var(--line-strong); font-size: 15px; }
+  .ops p { margin-top: 8px; color: var(--ink-light); }
+  .ops code { background: var(--cream); border-radius: 4px; padding: 0 5px; }
+
+  @media (max-width: 1080px) {
+    .bricks { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .hw { grid-template-columns: minmax(0, 1fr); gap: 24px; }
+  }
+  @media (max-width: 700px) {
+    .bricks, .hw-list, .ops { grid-template-columns: minmax(0, 1fr); }
+  }
+</style>
